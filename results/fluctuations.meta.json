@@ -1,0 +1,27 @@
+{
+ "date": "2026-10-18T16:31:26+00:00",
+ "elapsed_s": 184.6,
+ "git_commit": "d0a598c9ea09fcb2969b66a278f8a26d29351099",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_fluctuations.py",
+ "preset": "resistance",
+ "omegas": [
+  1,
+  3,
+  10,
+  30,
+  100
+ ],
+ "n": 100,
+ "window": [
+  200.0,
+  300.0
+ ],
+ "argv": [
+  "scripts/exp_fluctuations.py"
+ ]
+}

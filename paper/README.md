@@ -2,7 +2,10 @@
 
 One LaTeX source, two builds: `main.pdf` (full, for arXiv) and `main_anon.pdf`
 (double-blind, for Letters in Biomathematics). Structure follows the journal's
-Introduction, Materials and Methods, Results, Discussion.
+Introduction, Materials and Methods, Results, Discussion. Layout: two columns,
+10 pt Times (`newtx`), letter paper, conference-style numbered headings and
+"Figure 1." captions; all figures span both columns (`figure*`). The double-blind
+build adds line numbers and a "confidential review copy" header.
 
 ## Build locally
 

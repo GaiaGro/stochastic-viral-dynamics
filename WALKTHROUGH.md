@@ -87,12 +87,13 @@ Every experiment starts at the uninfected equilibrium `T0 = T*` of its preset.
 | figure | script | reads | produced by |
 |---|---|---|---|
 | 2 deterministic regimes | `fig2_deterministic.py` | nothing (ODE only) | |
-| 3 simulator against ODE, phase plane | `fig3_validation.py` | `baseline_ensemble.npz`, `baseline_validation.csv` | `exp_baseline.py` |
+| 3 simulator against ODE, phase planes, fluctuation size | `fig3_validation.py` | `baseline_ensemble.npz`, `fluctuations_phase.npz`, `fluctuations.csv` | `exp_baseline.py`, `exp_fluctuations.py` |
 | 4 establishment | `fig4_establishment.py` | `establishment.csv` | `exp_establishment.py` |
 | 5 immune activation failure | `fig5_immune_activation.py` | `immune_activation.csv`, `immune_activation_trajectories.npz` | `exp_immune_activation.py` |
 | 6 competitive release | `fig6_competitive_release.py` | `competitive_release_ensemble.npz` | `exp_resistance.py` |
 | 7 resistance emergence | `fig7_resistance.py` | `resistance.csv`, `resistance_system_size.csv` | `exp_resistance.py` |
 | 8 regime map | `fig8_regime_map.py` | `regime_map.csv` | `exp_regime_map.py` |
+| appendix: the notebook's regime map | `fig9_notebook_regime.py` | `regime_map_notebook_q.csv` | `exp_regime_map.py` |
 
 ## 6. Inspecting the numbers without running anything
 
@@ -121,6 +122,7 @@ What each file answers, and its key columns:
 | `regime_map_notebook_q.csv` | the same map with the notebook's q (nothing persists) | as above |
 | `regime_map_horizon.csv` | boundary cells followed to day 1000 | `p_persist_200`, `p_persist_1000` |
 | `baseline_validation.csv` | does the simulator track the ODE at large populations | `max_abs_log10_dev_median`, `coverage_5_95` |
+| `fluctuations.csv` | how fluctuations around the chronic fixed point shrink with system size, against linear-noise theory | `omega`, `species`, `cv_sim`, `cv_lna` |
 | `chronic_preset_check.csv` | the notebook's chronic preset from T0 = 1000 and from T* | `R_eff_at_start`, `n_alive` |
 
 Each `*.meta.json` next to a CSV records the git commit, whether the working tree
@@ -137,6 +139,7 @@ Everything is seeded, so a rerun gives the same CSV byte for byte; only the
 | `make exp-immune` | `immune_activation.*` | 15 s |
 | `make exp-immune-collapse` | `immune_collapse.csv` (needs the previous one) | 5 s |
 | `make exp-baseline` | `baseline_*`, `chronic_preset_check.csv` | 80 s |
+| `make exp-fluctuations` | `fluctuations.csv`, `fluctuations_phase.npz` | 2 min |
 | `make exp-regime-map` | `regime_map*.csv` | 9 min |
 | `make exp-resistance` | `resistance*.csv`, `preset_viability.csv`, Figure 6 ensemble | 42 min |
 

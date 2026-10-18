@@ -1,8 +1,8 @@
 {
- "date": "2026-10-18T11:34:11+00:00",
- "elapsed_s": 422.6,
- "git_commit": "5fbd1831b303d119c6e1519c1293b0a99b1d9b99",
- "code_dirty": true,
+ "date": "2026-10-18T15:45:38+00:00",
+ "elapsed_s": 152.2,
+ "git_commit": "589b0bc663a61a6739f96b8753ab3277e8a13572",
+ "code_dirty": false,
  "numba": "0.68.0",
  "numpy": "2.5.4",
  "python": "3.12.3",

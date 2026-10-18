@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures paper clean exp-baseline exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
+.PHONY: help install lock test bench figures paper clean exp-baseline exp-fluctuations exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
 
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
@@ -10,6 +10,7 @@ help:
 	@echo "figures            rebuild every figure from the committed CSVs in results/"
 	@echo "paper              generated tables, figures, and both manuscript PDFs (paper/main.pdf, paper/main_anon.pdf)"
 	@echo "exp-baseline       rerun the SSA-versus-ODE validation ensemble (writes results/baseline_*)"
+	@echo "exp-fluctuations   fluctuations around the chronic fixed point against system size (writes results/fluctuations*)"
 	@echo "exp-establishment  rerun the establishment experiment (writes results/establishment.csv)"
 	@echo "exp-immune         rerun the immune-activation experiment (writes results/immune_activation.*)"
 	@echo "exp-immune-collapse  follow collapsed responses to day 200 (writes results/immune_collapse.csv)"
@@ -19,6 +20,9 @@ help:
 
 exp-baseline:
 	$(PY) scripts/exp_baseline.py
+
+exp-fluctuations:
+	$(PY) scripts/exp_fluctuations.py
 
 exp-establishment:
 	$(PY) scripts/exp_establishment.py

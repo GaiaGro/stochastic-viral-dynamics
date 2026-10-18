@@ -4,73 +4,73 @@
 \subsection{Two deterministic regimes, and where the exact simulation agrees with them}
 \label{sec:regimes}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig2_deterministic.pdf}
   \caption{Deterministic regimes. (a) Chronic infection in the resistance preset. (b) Acute infection cleared by the effector response. \note{final caption}}
   \label{fig:deterministic}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig3_validation.pdf}
-  \caption{The exact simulation against the deterministic solution at large populations (\BaselineN{} realisations). (a) Median and 5th to 95th percentile band per species. (b) Phase plane. \note{final caption}}
+  \caption{The exact simulation against the deterministic solution. (a) Median and 5th to 95th percentile band per species at system size 100 (\BaselineN{} realisations). (b) Phase plane of one realisation at system sizes 1 and 100 with the deterministic orbit. (c) Coefficient of variation in the stationary window against system size, with the linear-noise prediction. \note{final caption}}
   \label{fig:validation}
-\end{figure}
+\end{figure*}
 
 \note{Figures~\ref{fig:deterministic} and \ref{fig:validation}: median within $\BaselineMaxLogDev$ in $\log_{10}$ for the four large populations; the mutant is where the descriptions part.}
 
 \subsection{Establishment from a small inoculum}
 \label{sec:establishment}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig4_establishment.pdf}
   \caption{Probability of establishment. (a) Against inoculum for four fixed effector counts. (b) Against $R_0$ for inocula of 1 and 5 virions, with the deterministic step. Points: simulation with 95\,\% Wilson intervals; lines: branching theory. \note{final caption}}
   \label{fig:establishment}
-\end{figure}
+\end{figure*}
 
 \note{Theory inside the interval in \EstInsideInterval{} of \EstConditions{} conditions; one virion at $R_0 = \RzeroEstablishment$ establishes with probability \EstOneVirionTheory{} (observed \EstOneVirionObserved).}
 
 \subsection{Stochastic failure of immune activation}
 \label{sec:immune}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig5_immune_activation.pdf}
   \caption{Failure of immune activation. (a) Against initial effector count for three death rates. (b) Against effector death rate: full model, founding-lineage route only, no-killing variant, and Kendall's formula. (c) One hundred realisations from one virion and one effector cell, coloured by fate. \note{final caption}}
   \label{fig:immune}
-\end{figure}
+\end{figure*}
 
 \note{Headline: with one effector cell, activation fails in \ImmFailObserved\,\% of established infections (\ImmFailLow{} to \ImmFailHigh), theory \ImmFailTheory\,\%; \ImmFailUnconditional\,\% unconditionally. Across death rates \ImmFailDeMin{} to \ImmFailDeMax\,\%. The second route above 1 per day.}
 
 \subsection{Competitive release and the emergence of resistance}
 \label{sec:resistance}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig6_competitive_release.pdf}
   \caption{Competitive release. (a) Deterministic. (b) Median and band of 1000 realisations. (c) Fraction of realisations with each strain present. \note{final caption}}
   \label{fig:release}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig7_resistance.pdf}
   \caption{Probability that resistance emerges. (a) Over treatment start and efficacy; the deterministic model predicts takeover in every outlined cell. (b) Observed against the branching prediction conditional on the wild type's survival time. (c) Against system size. \note{final caption}}
   \label{fig:resistance}
-\end{figure}
+\end{figure*}
 
 \note{Deterministic takeover in \OdeTakeoverCells{} of 25 cells; stochastic emergence \EmergeSuppressedMin{} to \EmergeSuppressedMax\,\% when the drug suppresses the wild type (cure at least \CureSuppressedMin\,\%), \EmergeWeakMin{} to \EmergeWeakMax\,\% at $\varepsilon_\beta = 0.5$; system size $\Omega = \OmegaMax$: \EmergeOmegaMax\,\% emergence, \CureOmegaMax\,\% cure. The notebook's therapy preset: trough \TherapyTrough{} virions at day \TherapyTroughDay, \TherapyAlive{} of 1000 alive.}
 
 \subsection{A stochastic regime map}
 \label{sec:map}
 
-\begin{figure}[tbp]
+\begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig8_regime_map.pdf}
   \caption{Regime map over infectivity and killing rate. (a) Probability of establishment. (b) Probability of persistence at day 200. (c) Transect at the preset killing rate. \note{final caption}}
   \label{fig:map}
-\end{figure}
+\end{figure*}
 
 \note{Of \MapChronicCells{} deterministically chronic cells, \MapNeverPersist{} never persist, \MapIntermediate{} persist with intermediate probability, \MapAlwaysPersist{} in more than 95\,\% of runs; with the preset's $q$ the deterministic model calls \MapNotebookChronicCells{} cells chronic and nothing persists.}

@@ -25,8 +25,9 @@ from typing import NamedTuple
 
 import numpy as np
 from scipy.integrate import cumulative_trapezoid
+from scipy.linalg import solve_continuous_lyapunov
 
-from .model import E, IM, IW, T, VM, VW, Params, solve_ode
+from .model import E, IM, IW, N_REACTIONS, STOICH, T, VM, VW, Params, ode_rhs, propensities, solve_ode
 
 
 class ExtinctionProbabilities(NamedTuple):
@@ -168,6 +169,37 @@ def mutant_lineage_rates(p: Params, T, E_t):
     """Lumped birth and death rates of a mutant-infected-cell lineage in the
     environment (T, E): birth p_m pi_m(T), death delta + k E."""
     return p.pm * infection_probability(p.bm, p.cm, np.asarray(T, dtype=float)), p.delta + p.k * np.asarray(E_t, dtype=float)
+
+
+# --- fluctuations around a stable fixed point (linear-noise approximation) ---
+
+
+def fixed_point(p: Params, x0, t_max=3000.0):
+    """The state the deterministic model reaches from x0 after a long time."""
+    x = solve_ode(p, x0, [0.0, t_max])[-1]
+    return np.maximum(x, 0.0)
+
+
+def jacobian(p: Params, x, h=1e-6):
+    """Jacobian of the deterministic right-hand side S a(x) by central differences."""
+    x = np.asarray(x, dtype=float)
+    J = np.empty((x.size, x.size))
+    for j in range(x.size):
+        d = np.zeros(x.size)
+        d[j] = h * max(1.0, abs(x[j]))
+        J[:, j] = (ode_rhs(0.0, x + d, p) - ode_rhs(0.0, x - d, p)) / (2.0 * d[j])
+    return J
+
+
+def linear_noise_covariance(p: Params, x_star):
+    """Stationary covariance of the fluctuations around a stable fixed point in the
+    linear-noise approximation (van Kampen): J C + C J^T + D = 0 with
+    D = S diag(a(x*)) S^T. Under the system-size scaling of `scale_system_size`
+    C grows like omega, so coefficients of variation fall like omega^(-1/2)."""
+    x_star = np.asarray(x_star, dtype=float)
+    a = propensities(x_star, p, np.empty(N_REACTIONS))
+    D = STOICH @ np.diag(a) @ STOICH.T
+    return solve_continuous_lyapunov(jacobian(p, x_star), -D)
 
 
 def establishment_probability_decaying_effectors(p: Params, x0, t_max=400.0, n=8001) -> float:
