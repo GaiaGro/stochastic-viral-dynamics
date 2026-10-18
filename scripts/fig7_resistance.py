@@ -58,7 +58,7 @@ def main():
     cb = fig.colorbar(im, ax=ax_a, fraction=0.046, pad=0.03)
     cb.set_label("P(resistance emerges)")
     cb.outline.set_visible(False)
-    ax_a.set_title(f"outlined: deterministic takeover; dashed: $\\varepsilon^* = {eps_star:.2f}$, wild type suppressed above", fontsize=7.5, color=MUTED, loc="left")
+    ax_a.set_title(f"outlined: deterministic takeover\ndashed: $\\varepsilon^* = {eps_star:.2f}$, wild type suppressed above", fontsize=7.5, color=MUTED, loc="left")
     panel_label(ax_a, "a")
 
     # (b) observed against the per-realisation theory band
@@ -72,7 +72,7 @@ def main():
         ax_b.errorbar(hi, y, xerr=np.vstack([hi - lo, np.zeros_like(hi)]), yerr=yerr, fmt="o", color=colour, ecolor=colour, elinewidth=0.9, capsize=0, label=f"$\\varepsilon_\\beta = {e:g}$")
     ax_b.set_xlim(-0.02, 1.02)
     ax_b.set_ylim(-0.02, 1.02)
-    ax_b.set_xlabel("predicted P(resistance emerges), theory band")
+    ax_b.set_xlabel("predicted P(resistance emerges)")
     ax_b.set_ylabel("observed P(resistance emerges)")
     ax_b.legend(loc="upper left")
     panel_label(ax_b, "b")
