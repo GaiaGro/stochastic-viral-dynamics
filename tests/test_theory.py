@@ -44,10 +44,30 @@ def test_subcritical_lineages_die_out():
     assert establishment_probability(p, [1000, 0, 0, 5, 0, 0]) == pytest.approx(0.0, abs=1e-9)
 
 
-def test_mutation_is_a_small_perturbation():
-    q0 = extinction_probabilities(P.replace(mu=0.0), T=1000.0)
-    q1 = extinction_probabilities(P, T=1000.0)
-    assert abs(q0.q_Vw - q1.q_Vw) < 1e-3 and q1.q_Vw != q0.q_Vw
+def test_two_type_coupling_uses_the_mutant_virion():
+    """With mu = 0.5 and mutant virions that cannot infect (bm = 0), a wild-type
+    cell's effective production is p (1 - mu) and the wild type is one-type again."""
+    p = P.replace(mu=0.5, bm=0.0, k=0.0)
+    q = extinction_probabilities(p, T=1000.0)
+    assert 1.0 - q.q_Vw == pytest.approx(single_virion_closed_form(p.replace(pw=p.pw * (1 - p.mu), mu=0.0), 1000.0), abs=1e-9)
+    assert q.q_Vm == 1.0 and q.q_Im == 1.0
+
+
+def test_two_type_fixed_point_matches_hand_iteration():
+    p = P.replace(mu=0.2)
+    d, T0 = p.delta + p.k * 0.0, 1000.0
+    pi_w = infection_probability(p.bw, p.cw, T0)
+    pi_m = infection_probability(p.bm, p.cm, T0)
+    qVw = qIw = qVm = qIm = 0.0
+    for _ in range(100000):
+        qVw, qIw, qVm, qIm = (
+            (1 - pi_w) + pi_w * qIw,
+            d / (d + p.pw * (1 - ((1 - p.mu) * qVw + p.mu * qVm))),
+            (1 - pi_m) + pi_m * qIm,
+            d / (d + p.pm * (1 - qVm)),
+        )
+    q = extinction_probabilities(p, T=T0)
+    assert q == pytest.approx((qVw, qIw, qVm, qIm), abs=1e-10)
 
 
 def test_establishment_is_monotone():

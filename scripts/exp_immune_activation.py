@@ -52,12 +52,14 @@ FATES = ("bottleneck", "cleared", "immune_failure", "persistent_immune", "other"
 
 
 def classify(stop_reason, t_end, t_ext_ctl, cum_infections, threshold=THRESHOLD):
+    """`t_end` is unused: the virus and the effector lineage cannot die in the same
+    event, so an effector death time is always strictly before an extinction stop."""
     established = cum_infections >= threshold
     ctl_died = not np.isnan(t_ext_ctl)
     if stop_reason == STOP_EXTINCT:
         if not established:
             return "bottleneck"
-        return "cleared" if not ctl_died or t_ext_ctl >= t_end else "other"
+        return "other" if ctl_died else "cleared"
     return "immune_failure" if ctl_died else "persistent_immune"
 
 

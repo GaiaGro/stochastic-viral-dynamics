@@ -13,7 +13,7 @@ for provenance in [`notebooks/`](notebooks/).
 
 ```bash
 make install     # uv venv + requirements      (or: pip install -r requirements-lock.txt -e .)
-make test        # unit tests, about 1 min
+make test        # unit tests, about 20 s
 make bench       # time the compiled simulator in each regime
 make figures     # rebuild every figure from the committed CSVs in results/
 ```
@@ -30,7 +30,7 @@ make figures     # rebuild every figure from the committed CSVs in results/
 | `scripts/exp_*.py` | one script per experiment; each writes CSVs plus a `.meta.json` with the git commit, seeds and timing (`make exp-<name>`) |
 | `scripts/fig*.py` | one script per figure, reading only the committed results (`make figures`) |
 | `results/` | committed CSVs that every figure and every number in the paper is read from |
-| `paper/` | LaTeX sources |
+| `paper/` | manuscript sources and `notebook_corrections.md`, the record of what the course notebook got wrong |
 
 ## Model
 

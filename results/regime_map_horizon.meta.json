@@ -1,0 +1,16 @@
+{
+ "date": "2026-10-18T11:36:03+00:00",
+ "elapsed_s": 534.0,
+ "git_commit": "5fbd1831b303d119c6e1519c1293b0a99b1d9b99",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_regime_map.py",
+ "n_per_cell": 200,
+ "t_long": 1000.0,
+ "argv": [
+  "scripts/exp_regime_map.py"
+ ]
+}

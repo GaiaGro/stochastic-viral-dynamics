@@ -125,6 +125,12 @@ Each CSV row carries its seed. No notebook in the final repo except an optional
   Theory falls inside the 95 percent interval in 64 of 68 conditions, pooled z = -0.17,
   largest absolute deviation 0.034. Panel (b) adds the R0 sweep for V0 in {1, 5}
   against the deterministic step.
+- Review 2026-10-18: the establishment experiment freezes the effectors (q = d_E = 0)
+  so that the fixed-effector branching formula is exact rather than approximate; say
+  so in Methods. The threshold of 100 cumulative infections is immaterial: for one
+  virion at five infectivities (R0 1.9 to 33) the probability of reaching 25, 50, 100,
+  200 or 400 infections is identical to four decimals
+  (`results/establishment_threshold.csv`).
 
 ### WP3 Immune activation failure. ~1 day theory, 0.5 day compute.
 - Phenomenon: with E0 small, q I(t) E versus d_E E is a time-inhomogeneous linear
@@ -156,6 +162,19 @@ Each CSV row carries its seed. No notebook in the final repo except an optional
   `scripts/exp_immune_activation.py`, `scripts/fig5_immune_activation.py`,
   `tests/test_immune_activation.py`. The SSA gained a per-species cap (`stop_above`)
   because nothing limits the effectors when k = 0.
+- Review 2026-10-18. Agreement by variant, pooled over the 33 conditions of the E0,
+  d_E and q sweeps (`results/immune_activation.csv`): Kendall on each realisation's
+  own path against the k = 0 variant, 0 of 33 outside the 95 percent interval,
+  pooled z = +0.7 (exact given the path); Kendall with deterministic forcing against
+  k = 0, 3 of 33 outside, pooled z = +3.6 (about 3 percent relative low); the same
+  against the full model, 8 of 33 outside, pooled z = +10, mostly from d_E above
+  1 per day where the collapse route adds failures the lineage formula does not
+  describe. Report all three. The split of failures at a peak effector count of 10 is
+  justified by the data: across all death rates no failure has a peak between 10
+  and 99, nearly all founding-lineage failures peak at 1, and the collapse route
+  peaks at 100 or more (`results/immune_collapse.csv`, columns `n_fail_peakE_*`).
+  Horizon: at the headline d_E = 0.1 none of the 85 failures clears by day 200 and
+  their load sits at the no-immune set point (same file).
 
 ### WP4 Competitive release and resistance emergence. ~0.5 day setup, compute
 overnight, 1 day analysis.
@@ -164,15 +183,16 @@ overnight, 1 day analysis.
 - Stochastic ensemble figure: N = 1000, show median and 5 to 95 percent band, not
   the mean, since the mean of zeros and oscillations misleads.
 - Main experiment: grid of treatment start t_treat in {5, 10, 20, 30, 50} days and
-  efficacy eps in {0.5, 0.7, 0.9, 0.99}, N = 1000 per cell. Outcome: mutant
-  infected cells plus mutant virus above zero at t_treat + 120 days and mutant
-  virus above 100 at that time. Record whether mutant lineage present at t_treat
-  (pre-existing) or arose after (de novo) by tracking the first mutation event
-  time after t_treat and the mutant state at t_treat.
-- Theory check: P_emerge ~ 1 - q_Vm^{Vm(t_treat)} q_Im^{Im(t_treat)} with the
-  mutant branching probabilities evaluated at the post-treatment target-cell level,
-  computed per realisation from the recorded state at t_treat and then averaged.
-  Plot predicted versus observed per grid cell.
+  efficacy eps in {0.5, 0.7, 0.8, 0.9, 0.99}, N = 1000 per cell. Outcome
+  ("emergence"): at least 100 mutant infection events during therapy, that is a
+  mutant lineage that established under treatment; the CSV also carries presence at
+  the horizon and thresholds 20 to 500. Pre-existing: a mutant cell or virion
+  present at t_treat; otherwise de novo.
+- Theory check: per realisation, the extinction probability of mutant lineages
+  along the wild-type-only deterministic path (time-inhomogeneous linear birth-death,
+  Kendall 1948), for the lineages present at t_treat and for a Poisson stream of
+  de novo mutants; the conditional version truncates the stream at the observed
+  wild-type extinction time. Plot predicted versus observed per grid cell.
 - Also report time from treatment start to mutant dominance (mutant virus exceeds
   WT virus) with its distribution.
 - Compute budget: 20 cells x 1000 runs at 0.4 s per run is about 2.2 core-hours,
@@ -189,29 +209,60 @@ overnight, 1 day analysis.
   point (2 infected cells). The deterministic competitive-release figure of the
   notebook therefore rests on a trajectory that would have ended in clearance.
   Recorded in results/preset_viability.csv. (2) New "resistance" preset: same R0
-  (4.8 wild type, 3.9 mutant, suppression threshold eps* = 0.79), slower and weaker
+  (4.8 wild type, 3.9 mutant, suppression threshold eps* = 0.798), slower and weaker
   effector response (q = 0.002, k = 0.003) so that the set point is I* = d_E/q = 50
   infected cells and about 1200 virions; all 1000 realisations survive 100 days and a
-  mutant lineage is present at day 30 in about 15 percent of them. Start state: 10
-  infected cells, 10 effectors. (3) Grid t_treat in {5,10,20,30,50} x eps in
-  {0.5,0.7,0.8,0.9,0.99}, N = 1000, horizon 120 days, emergence = 100 mutant infection
-  events during therapy. The deterministic model predicts mutant takeover in all 25
-  cells. Stochastically: below 2 percent whenever the drug suppresses the wild type
-  (eps >= 0.8; cure in 98 to 100 percent of runs), 23 to 29 percent at eps = 0.5
-  where the wild type persists and keeps producing mutants that are fitter under
-  drug (slow replacement, median 60 days), 5 to 8 percent at eps = 0.7. (4) Theory
-  per realisation uses the wild-type-only deterministic path as the environment
-  (the first version used the path with the mutant in it and underpredicted five
-  times). It matches at eps >= 0.8 and eps = 0.5 and fails at eps = 0.7 (predicts 42
-  percent) because there the drug pushes the wild type itself through a trough it
-  survives in only 6 percent of realisations, so the de novo supply the theory
-  assumes never materialises. Say this plainly in the paper. (5) System-size sweep at
-  (30, 0.9) scaling lam, 1/beta, 1/q, 1/k and the state by Omega in {1,3,10,30,100}:
-  P(emergence) 0.8, 1.4, 6.8, 21, 52 percent, inside the theory band at every size;
-  cure still 48 percent at Omega = 100. Files: scripts/exp_resistance.py (10 min on
-  16 cores, dominated by the Omega = 100 runs), scripts/fig6_competitive_release.py,
-  scripts/fig7_resistance.py, tests/test_resistance.py, results/resistance*.csv,
+  mutant lineage is present at day 30 in 15 to 18 percent of them (30 to 35 percent
+  at day 5, just after the primary peak). Start state: T* with 10 infected cells and
+  10 effectors. (3) Grid t_treat in {5,10,20,30,50} x eps in {0.5,0.7,0.8,0.9,0.99},
+  N = 1000, horizon 120 days, emergence = 100 mutant infection events during therapy.
+  The deterministic model predicts mutant takeover in all 25 cells. Stochastically:
+  0.3 to 1.7 percent whenever the drug suppresses the wild type (eps >= 0.8; cure in
+  98 to 100 percent of runs), 23 to 29 percent at eps = 0.5 where the wild type
+  persists and keeps producing mutants that are fitter under drug (slow replacement,
+  medians 58 to 66 days after treatment start over the 23 to 28 percent of runs in
+  which it happens), 4.6 to 8.5 percent at eps = 0.7. Files: scripts/exp_resistance.py,
+  scripts/fig6_competitive_release.py, scripts/fig7_resistance.py,
+  tests/test_resistance.py, results/resistance*.csv,
   results/competitive_release_ensemble.npz, results/preset_viability.csv.
+- Review 2026-10-18 (several claims of the first version of this entry were wrong
+  and are replaced here). Suppression threshold: R0 is not linear in 1 - eps because
+  beta sits in the virion-consumption denominator; solving R0(eps) = 1 gives
+  eps* = 0.798 (`suppression_efficacy`), so the grid value 0.8 lies 1 percent below
+  criticality (R0 = 0.99) and is kept as a deliberate knife-edge point. Theory: the
+  earlier "band" (two environments for the pre-existing lineages plus a frozen-
+  environment de novo term) matched only where it was too loose to fail and
+  overpredicted by 20 to 25 percent at eps = 0.5; it is replaced by a single
+  prediction from Kendall's formula for a mutant-cell lineage along the wild-type-
+  only path (`lineage_extinction_from`), evaluated for the lineages present at
+  t_treat and for the de novo stream, in two versions: unconditional (stream to the
+  horizon) and conditional on the observed wild-type extinction time of each
+  realisation (`results/resistance.csv`, columns p_theory, p_theory_cond).
+  Conditional against observed: eps = 0.5, 0.24 to 0.28 vs 0.24 to 0.29; eps = 0.7,
+  0.04 to 0.07 vs 0.05 to 0.09 (unconditional 0.41 to 0.43, because the drug pushes
+  the wild type through a trough it survives for 30 days in only 9 to 19 percent of
+  realisations, column n_wt_survived_window); eps >= 0.8, 0.003 to 0.012 vs 0.003 to
+  0.017. One mechanism, all cells. System size, Omega in {1, 3, 10, 30, 100, 300}:
+  observed 0.8, 1.4, 6.8, 21, 52, 88 percent against the conditional theory 1.0,
+  1.4, 6.3, 17, 47, 83 percent; cure 99, 99, 93, 79, 48, 12 percent, so the
+  deterministic prediction of certain takeover is approached only above Omega = 100
+  (`results/resistance_system_size.csv`; scaling the emergence threshold with Omega
+  changes nothing, column p_emerge_threshold_scaled). Emergence threshold: 20 to 500
+  events give the same probabilities to within 0.03 at eps = 0.5 and 0.001 elsewhere.
+  Preset sensitivity at (30, 0.9) (`results/resistance_preset_sensitivity.csv`):
+  k = 0.001 / 0.003 / 0.01 gives emergence 0.3 / 0.8 / 0.5 percent and cure 100 / 99 /
+  99 percent; q = 0.0005 (I* = 200) gives 1.5 percent; q = 0.01 (I* = 10) is not a
+  viable chronic infection (1000 of 1000 realisations die before treatment), which
+  closes the "why 50" question. Horizon (`results/resistance_horizon.csv`): at
+  eps = 0.5 emergence rises from 0.24 to 0.29 at day 120 to 0.56 to 0.65 at day 360
+  as the replacement runs its course (the unconditional and conditional theories,
+  0.69 and 0.40 to 0.46, bracket it there), so the eps = 0.5 cells are reported as
+  replacement in progress and the 120-day numbers as a lower bound; at eps >= 0.8 the
+  horizon is irrelevant because the wild type is gone within days. One realisation
+  at (50, 0.99) died before treatment, so that cell has n = 999. Initial state: the
+  runs start at T* with 10 infected cells and 10 effectors, 7 percent of the chronic
+  E* of 141, so every run passes through a primary peak before settling; Methods
+  says so. Runtime 42 min on 16 cores, 29 of them for Omega = 300.
 
 ### WP5 Stochastic regime map. ~0.5 day.
 - Replace the deterministic beta x k classification with P(establishment at day 30)
@@ -225,13 +276,27 @@ overnight, 1 day analysis.
   cell, so not one of 125,000 realisations persists to day 200 while the
   deterministic model calls 131 cells chronic (results/regime_map_notebook_q.csv);
   (2) the main map lowers q to 0.002 (I* = 50): the deterministic model then calls
-  370 cells chronic and none cleared, while stochastically 156 of those 370 never
-  persist, 97 persist with intermediate probability and only 117 persist in more
-  than 95 percent of runs (results/regime_map.csv). Establishment is smeared over
-  about a decade of beta around R_eff = 1 and follows the branching contour; the
-  notebook's vertical R0 = 1 line ignores the initial effectors, which shift the
-  threshold by a factor 1 + k E0 / delta. Figure 8: establishment map, persistence
-  map, transect at k = 0.1. Whole experiment 78 s.
+  370 cells chronic and none cleared. Establishment is smeared over about a decade
+  of beta around R_eff = 1 and follows the branching contour; the notebook's
+  vertical R0 = 1 line ignores the initial effectors, which shift the threshold by a
+  factor 1 + k E0 / delta. Figure 8: establishment map, persistence map, transect at
+  k = 0.1.
+- Review 2026-10-18. The first status entry here misreported the persistence split
+  (it mislabelled the count of cells between 0.05 and 0.95 and derived the rest by
+  subtraction). Rerun with N = 1000 per cell (`results/regime_map.csv`): of the 370
+  deterministically chronic cells, 113 never persist to day 200, 212 persist with a
+  probability between 0 and 0.95, and 45 persist in more than 95 percent of runs
+  (101 cells lie between 0.05 and 0.95). The branching overlay now uses effectors that
+  decay from E0 at d_E before activation (`establishment_probability_decaying_effectors`);
+  it is outside the 95 percent interval in 58 of 625 cells against 83 for the
+  fixed-effector formula and against about 31 expected, with the excess at
+  R_eff near 1 where 100 cumulative infections is not yet ultimate survival (near-
+  critical cells: simulation 0.214, decaying-effector theory 0.198, fixed 0.149).
+  Horizon: the 127 cells with persistence between 0.02 and 0.98 were followed to day
+  1000 with 200 realisations each (`results/regime_map_horizon.csv`): persistence
+  falls by 0.035 on average and by 0.30 in the worst cell, and the 50 percent
+  classification flips in 4 of 127 cells, so the map is a day-200 statement and the
+  paper says so. Both maps and the horizon check run in 9 minutes.
 
 ### WP6 Fix carried-over errors. ~0.5 day.
 - Scenario (B) heading says chronic. "Single drug cART" contradiction. Mutant
@@ -249,9 +314,19 @@ overnight, 1 day analysis.
   acute regimes, `scripts/fig2_deterministic.py`, ODE only) and Figure 3 (200
   realisations of the chronic preset against the ODE plus the phase plane,
   `scripts/exp_baseline.py`, `scripts/fig3_validation.py`,
-  `results/baseline_validation.csv`: the ODE lies inside the 5 to 95 percent band at
-  every time for T, Iw, Vw and E, with the median within 0.16 in log10; the
-  mutant, at 0.003 to 38 virions in the ODE, is where the two descriptions part).
+  `results/baseline_validation.csv`).
+- Review 2026-10-18: the first version of Figure 3 used the notebook's chronic
+  preset from the notebook's state T0 = 1000, a thousandth of that preset's
+  uninfected equilibrium, where the wild type's reproduction number is 0.2; the
+  "chronic oscillations" are the target-cell repopulation transient, and from the
+  equilibrium the infection is cleared deterministically and dies in 200 of 200
+  realisations (`results/chronic_preset_check.csv`, corrections item 10). Figure 2's
+  chronic scenario is now the resistance preset from its equilibrium, and Figure 3
+  uses `chronic_large`, the resistance preset with all populations scaled by 100
+  (T* = 1e5, set point 5000 infected cells): the ODE lies inside the 5 to 95 percent
+  band at every time for T, Iw, Vw and E with the median within 0.004 in log10, no
+  realisation goes extinct, and the mutant (ODE 0.7 to 10 cells) is where the
+  descriptions part.
 
 ## 4. Tests (pytest, run in CI)
 

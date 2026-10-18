@@ -5,7 +5,7 @@ PY ?= .venv/bin/python
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
 	@echo "lock               write requirements-lock.txt from the current .venv"
-	@echo "test               run the unit tests (about 1 min)"
+	@echo "test               run the unit tests (about 20 s)"
 	@echo "bench              time the compiled SSA in each regime"
 	@echo "figures            rebuild every figure from the committed CSVs in results/"
 	@echo "exp-baseline       rerun the SSA-versus-ODE validation ensemble (writes results/baseline_*)"
@@ -48,7 +48,7 @@ bench:
 	$(PY) scripts/bench_ssa.py
 
 figures:
-	@for f in scripts/fig*.py; do [ -e "$$f" ] && $(PY) "$$f" || true; done
+	@set -e; for f in scripts/fig*.py; do $(PY) "$$f"; done
 
 clean:
 	rm -rf .pytest_cache viraldyn/__pycache__ tests/__pycache__ scripts/__pycache__

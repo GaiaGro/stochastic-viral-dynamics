@@ -14,16 +14,21 @@ acute regime: the infection is cleared. Figure 2 of the paper labels it
 
 cART is combination therapy, so the sentence contradicts itself, and the model has
 no pharmacology to support a clinical claim. The paper treats efficacy as a model
-parameter and sweeps it across the suppression threshold
-eps* = 1 - 1/R0 = 0.79 (`scripts/exp_resistance.py`, `results/resistance.csv`).
+parameter and sweeps it across the suppression threshold. That threshold is not
+1 - 1/R0 = 0.79, as the notebook's section 4.3 implies, because beta also sits in the
+virion-consumption denominator of R0; solving R0(eps) = 1 exactly gives
+eps* = 0.798 (`viraldyn.model.suppression_efficacy`). The grid value 0.8 therefore
+lies 1 percent below criticality (R0 = 0.99), which the paper states
+(`scripts/exp_resistance.py`, `results/resistance.csv`).
 
 ## 3. "We assume the mutant exists already before the arrival of the drug"
 
 The initial state of every notebook simulation has no mutant; mutants arise by
 mutation during wild-type production (channel 4). The paper keeps that mechanism and
 uses "pre-existing" only for a mutant lineage present at the moment treatment starts,
-which is a random event with probability about 0.15 in the resistance preset
-(`results/resistance.csv`, column `n_pre_existing`).
+which is a random event whose probability depends on when treatment starts: about
+0.3 at day 5, just after the primary peak, and 0.11 to 0.18 from day 10 on in the
+resistance preset (`results/resistance.csv`, column `n_pre_existing`).
 
 ## 4. "Probability of Infection Establishment: 4.9 percent established"
 
@@ -82,7 +87,21 @@ and a test that it equals the six written equations (`tests/test_model.py`).
 The notebook seeded numpy once at the top, so results depended on execution order.
 Every realisation in the repository carries its own seed, recorded with the results.
 
-## 10. The stochastic therapy ensemble showed means
+## 10. The "chronic" scenario starts a thousand times below its own equilibrium
+
+The chronic preset has lambda / d_T = 1e6 target cells at the uninfected
+equilibrium, but every notebook run starts from T0 = 1000, where the wild type's
+reproduction number is 0.2. The damped oscillations the notebook shows are the
+transient of target-cell repopulation (T has reached only 1.3e5 by day 60). Started
+from its equilibrium the deterministic infection peaks on day 1 at 1.4e6 and is
+cleared, and 0 of 200 exact realisations survive to day 60; from T0 = 1000 all 200
+survive (`results/chronic_preset_check.csv`). The paper's chronic scenario is the
+resistance preset, started at its equilibrium T* = 1000, and the large-population
+check of Figure 3 uses that preset with every population scaled by 100
+(`chronic_large`), which keeps its deterministic dynamics exactly
+(`scripts/exp_baseline.py`, `results/baseline_validation.csv`).
+
+## 11. The stochastic therapy ensemble showed means
 
 Means of trajectories that are zero in some realisations and oscillating in others
 are not representative. Figure 6 shows medians and 5th to 95th percentile bands and

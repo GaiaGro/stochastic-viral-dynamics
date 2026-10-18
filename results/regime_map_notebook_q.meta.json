@@ -1,7 +1,7 @@
 {
- "date": "2026-10-18T10:25:31+00:00",
- "elapsed_s": 77.5,
- "git_commit": "967d2e42e1eb9d850ac07e4c4b38c4bde7a8161b",
+ "date": "2026-10-18T11:34:11+00:00",
+ "elapsed_s": 422.6,
+ "git_commit": "5fbd1831b303d119c6e1519c1293b0a99b1d9b99",
  "code_dirty": true,
  "numba": "0.68.0",
  "numpy": "2.5.4",
@@ -9,7 +9,7 @@
  "cpu_count": 16,
  "script": "exp_regime_map.py",
  "q": 0.1,
- "n_per_cell": 200,
+ "n_per_cell": 1000,
  "threshold": 100,
  "t_end": 200.0,
  "x0": [

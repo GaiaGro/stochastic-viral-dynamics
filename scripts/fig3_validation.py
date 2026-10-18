@@ -52,7 +52,7 @@ def main():
         Line2D([], [], color=COLOR["wt"], lw=1.5, label="wild type"),
         Line2D([], [], color=COLOR["mut"], lw=1.5, label="mutant"),
     ]
-    axes[0].legend(handles=handles, loc="lower right", ncol=2, fontsize=7)
+    axes[2].legend(handles=handles, loc="lower right", ncol=2, fontsize=7)
     panel_label(axes[0], "a")
 
     X, pode = d["phase_X"].astype(float), d["phase_ode"]
@@ -63,7 +63,7 @@ def main():
     ax_phase.set_yscale("log")
     ax_phase.set_xlabel("wild-type virions $V_w$")
     ax_phase.set_ylabel("effector cells $E$")
-    ax_phase.legend(loc="lower left", fontsize=7)
+    ax_phase.legend(loc="center left", fontsize=7)
     panel_label(ax_phase, "b")
 
     out = save(fig, "fig3_validation")

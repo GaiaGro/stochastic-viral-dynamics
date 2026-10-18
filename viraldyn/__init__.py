@@ -12,7 +12,9 @@ from .model import (
     propensities,
     r0_mutant,
     r0_wild_type,
+    scale_system_size,
     solve_ode,
+    suppression_efficacy,
     target_cell_equilibrium,
 )
 from .ssa import SSAResult, simulate
@@ -30,7 +32,9 @@ __all__ = [
     "propensities",
     "r0_mutant",
     "r0_wild_type",
+    "scale_system_size",
     "simulate",
     "solve_ode",
+    "suppression_efficacy",
     "target_cell_equilibrium",
 ]

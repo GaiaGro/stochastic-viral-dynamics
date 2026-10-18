@@ -1,7 +1,7 @@
 {
- "date": "2026-10-18T08:30:00+00:00",
- "elapsed_s": 2.5,
- "git_commit": "dc0219e42c5336d7122850e2118eb57ec04358ce",
+ "date": "2026-10-18T11:25:03+00:00",
+ "elapsed_s": 2.8,
+ "git_commit": "5fbd1831b303d119c6e1519c1293b0a99b1d9b99",
  "code_dirty": true,
  "numba": "0.68.0",
  "numpy": "2.5.4",
@@ -10,6 +10,13 @@
  "script": "exp_establishment.py",
  "n_per_condition": 2000,
  "threshold": 100,
+ "thresholds_checked": [
+  25,
+  50,
+  100,
+  200,
+  400
+ ],
  "t_max": 500.0,
  "argv": [
   "scripts/exp_establishment.py"

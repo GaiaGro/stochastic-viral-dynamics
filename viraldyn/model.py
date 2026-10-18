@@ -158,12 +158,37 @@ def r0_mutant(p) -> float:
 
 
 def immune_activation_threshold(p) -> float:
-    """Infected-cell load above which CTLs grow: q (Iw + Im) > d_E."""
+    """Infected-cell load above which CTLs grow: q (Iw + Im) > d_E. With an active
+    response it is also the chronic set point of infected cells."""
     return p.dE / p.q
+
+
+def suppression_efficacy(p) -> float:
+    """Infection-blocking efficacy at which the wild type's R0 falls to one.
+
+    R0(eps) = (1-eps) beta T* p (1-mu) / (delta (c + (1-eps) beta T*)) is not linear
+    in 1 - eps because of virion consumption; solving R0 = 1 gives
+    1 - eps* = delta c / (beta T* (p (1-mu) - delta)).
+    """
+    Ts = target_cell_equilibrium(p)
+    return 1.0 - p.delta * p.cw / (p.bw * Ts * (p.pw * (1.0 - p.mu) - p.delta))
+
+
+def scale_system_size(p, omega):
+    """Multiply every population by `omega` without changing the deterministic
+    dynamics as densities: lambda -> omega lambda, beta -> beta / omega,
+    q -> q / omega, k -> k / omega (the per-capita rates delta, d_T, d_E, p, c and
+    the mutation probability are intensive and stay)."""
+    return p.replace(lam=p.lam * omega, bw=p.bw / omega, bm=p.bm / omega, q=p.q / omega, k=p.k / omega)
 
 
 # Parameter sets carried over from the course notebook (illustrative, not fitted).
 PRESETS = {
+    # The notebook's "chronic" scenario. Its uninfected equilibrium is T* = 1e6, but the
+    # notebook starts every run from T0 = 1000, where the wild type's reproduction
+    # number is 0.2; the oscillations it shows are the transient of target-cell
+    # repopulation. Started from T*, the infection peaks on day 1 and is cleared
+    # (results/chronic_preset_check.csv). Kept for provenance and simulator tests.
     "chronic": Params.make(
         lam=1e4, dT=0.01, bw=2e-5, bm=1e-5, pw=20.0, pm=18.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=0.5, k=1e-4, q=1e-4, dE=0.1,
@@ -192,3 +217,7 @@ PRESETS = {
         cw=4.0, cm=4.0, delta=1.0, k=0.003, q=0.002, dE=0.1,
     ),
 }
+# The chronic infection at large population size used for the simulator-versus-ODE
+# check: the resistance preset with every population scaled by 100 (T* = 1e5, set
+# point 5000 infected cells), which keeps its deterministic dynamics exactly.
+PRESETS["chronic_large"] = scale_system_size(PRESETS["resistance"], 100)

@@ -35,18 +35,21 @@ from viraldyn.ensembles import provenance, run_seeds, write_meta
 from viraldyn.model import E, target_cell_equilibrium
 from viraldyn.ssa import STOP_EXTINCT
 from viraldyn.stats import wilson
-from viraldyn.theory import establishment_probability, infection_probability
+from viraldyn.theory import establishment_probability, establishment_probability_decaying_effectors, infection_probability
 
 ROOT = Path(__file__).resolve().parents[1]
 Q_MAIN = 0.002  # chronic set point I* = d_E / q = 50 infected cells
 Q_NOTEBOOK = 0.1  # the preset's value: I* = 1
 MAPS = {Q_MAIN: ROOT / "results" / "regime_map.csv", Q_NOTEBOOK: ROOT / "results" / "regime_map_notebook_q.csv"}
+HORIZON_OUT = ROOT / "results" / "regime_map_horizon.csv"
 BASE = PRESETS["establishment"].replace(q=Q_MAIN)
-X0 = [1000, 0, 0, 5, 0, 10]
+X0 = [1000, 0, 0, 5, 0, 10]  # T0 = T* = lambda / d_T
 BETA = np.logspace(-5, -1, 25)
 K = np.logspace(-3, 1, 25)
-N = 200
+N = 1000
 T_END = 200.0
+T_LONG = 1000.0  # horizon check for the cells with intermediate persistence
+N_LONG = 200
 THRESHOLD = 100
 E_CAP = 10_000_000  # safety only; nothing in this grid is expected to reach it
 
@@ -73,6 +76,13 @@ def one(seed, p):
     established = r.cumulative_infections >= THRESHOLD
     persist = r.stop_reason != STOP_EXTINCT
     return established, persist, int(r.x_end[E]) == 0
+
+
+def one_long(seed, p):
+    """Virus present at day 200 and at day 1000 for the same realisation."""
+    r = simulate(p, X0, [0.0, T_END, T_LONG], seed_value=seed, stop_on_extinction=True, stop_above=[0, 0, 0, 0, 0, E_CAP])
+    present_200 = r.X[1, 1] >= 0 and r.X[1, 1:5].sum() > 0
+    return present_200, r.stop_reason != STOP_EXTINCT
 
 
 def deterministic(p):
@@ -105,7 +115,8 @@ def run_map(q, seed):
                 "n": N, "n_established": est, "n_persist": per, "n_effectors_extinct": sum(o[2] for o in out),
                 "p_est": est / N, "p_est_low": float(lo_e), "p_est_high": float(hi_e),
                 "p_persist": per / N, "p_persist_low": float(lo_p), "p_persist_high": float(hi_p),
-                "p_est_theory": establishment_probability(p, X0),
+                "p_est_theory": establishment_probability_decaying_effectors(p, X0),
+                "p_est_theory_fixedE": establishment_probability(p, X0),
                 "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(peak, end),
                 "seed_start": seed,
             })
@@ -113,12 +124,29 @@ def run_map(q, seed):
     return rows, seed
 
 
+def horizon_check(rows, seed):
+    """Cells of the main map with intermediate persistence, followed to day 1000."""
+    out = []
+    for r in rows:
+        if not 0.02 < r["p_persist"] < 0.98:
+            continue
+        res = run_seeds(partial(one_long, p=params(r["bw"], r["k"], r["q"])), range(seed, seed + N_LONG))
+        k200, k1000 = sum(o[0] for o in res), sum(o[1] for o in res)
+        out.append({"bw": r["bw"], "k": r["k"], "q": r["q"], "n": N_LONG, "p_persist_main": r["p_persist"],
+                    "p_persist_200": k200 / N_LONG, "p_persist_1000": k1000 / N_LONG, "seed_start": seed})
+        seed += N_LONG
+    return out, seed
+
+
 def main():
     started = time.time()
     one(0, params(1e-3, 0.1))
     seed = 4_000_000
+    main_rows = None
     for q, out in MAPS.items():
         rows, seed = run_map(q, seed)
+        if q == Q_MAIN:
+            main_rows = rows
         with open(out, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0]))
             w.writeheader()
@@ -129,7 +157,15 @@ def main():
         mixed_per = sum(0.05 < r["p_persist"] < 0.95 for r in rows)
         persist_any = sum(r["p_persist"] > 0 for r in rows)
         print(f"q={q}: {len(rows)} cells, {time.time() - started:.0f} s elapsed; deterministic classes {classes}; "
-              f"cells with intermediate establishment {mixed_est}, intermediate persistence {mixed_per}, any persistence {persist_any}")
+              f"cells with intermediate establishment {mixed_est}, intermediate persistence {mixed_per}, any persistence {persist_any}", flush=True)
+    hz, seed = horizon_check(main_rows, seed)
+    with open(HORIZON_OUT, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(hz[0]))
+        w.writeheader()
+        w.writerows(hz)
+    write_meta(HORIZON_OUT.with_suffix(".meta.json"), provenance(started, script=Path(__file__).name, n_per_cell=N_LONG, t_long=T_LONG, argv=sys.argv))
+    d = np.array([r["p_persist_1000"] - r["p_persist_200"] for r in hz])
+    print(f"horizon check: {len(hz)} cells followed to day {T_LONG:g}; persistence at 1000 minus at 200: mean {d.mean():+.3f}, min {d.min():+.3f}; {time.time() - started:.0f} s total")
 
 
 if __name__ == "__main__":

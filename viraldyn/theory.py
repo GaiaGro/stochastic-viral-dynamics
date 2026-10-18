@@ -12,6 +12,13 @@ point of the generating-function equations, found by iterating from zero.
 
 For mu = 0 the wild-type equations collapse to a quadratic with the closed form
 P(establish from one virion) = pi (1 - 1/R0), with R0 = pi p / d.
+
+When the environment changes in time (effectors decaying or expanding, target
+cells recovering) a lineage of infected cells is approximated by a linear
+birth-death process with per-capita birth rate p pi(T(t)) (virions produced times
+the probability each one infects) and death rate delta + k E(t); in a constant
+environment this gives the same per-cell extinction probability 1/R as the exact
+two-stage process. Kendall (1948) gives its extinction probability in closed form.
 """
 
 from typing import NamedTuple
@@ -19,7 +26,7 @@ from typing import NamedTuple
 import numpy as np
 from scipy.integrate import cumulative_trapezoid
 
-from .model import E, IM, IW, VM, VW, Params, solve_ode
+from .model import E, IM, IW, T, VM, VW, Params, solve_ode
 
 
 class ExtinctionProbabilities(NamedTuple):
@@ -45,9 +52,9 @@ def extinction_probabilities(p: Params, T, E_fixed=0.0, tol=1e-14, max_iter=2_00
     pi_w = infection_probability((1.0 - p.eps_b) * p.bw, p.cw, T)
     pi_m = infection_probability(p.bm, p.cm, T)
     pw = (1.0 - p.eps_p) * p.pw
-    q = np.zeros(4)
+    q = np.zeros(4)  # order: q_Vw, q_Iw, q_Vm, q_Im
     for _ in range(max_iter):
-        s_w = (1.0 - p.mu) * q[VW - 3] + p.mu * q[VM - 3]  # offspring of a WT-infected cell
+        s_w = (1.0 - p.mu) * q[0] + p.mu * q[2]  # a WT cell's virion is wild type or mutant
         new = np.array(
             [
                 (1.0 - pi_w) + pi_w * q[1],
@@ -64,7 +71,7 @@ def extinction_probabilities(p: Params, T, E_fixed=0.0, tol=1e-14, max_iter=2_00
 
 
 def establishment_probability(p: Params, x0, T=None, E_fixed=None) -> float:
-    """1 - P(every founding lineage in x0 dies out).
+    """1 - P(every founding lineage in x0 dies out), effectors held fixed.
 
     By default the target-cell count is x0[T] and the fixed effector count x0[E].
     """
@@ -100,19 +107,42 @@ def single_virion_closed_form(p: Params, T, E_fixed=0.0) -> float:
     return max(0.0, pi * (1.0 - 1.0 / r0)) if r0 > 0 else 0.0
 
 
-# --- the effector lineage: a linear birth-death process driven by the infected-cell load ---
+# --- linear birth-death lineages in a changing environment (Kendall 1948) ---
+
+_EXP_CAP = 700.0  # exp overflows above this; beyond it W is effectively infinite and p0 = 1
 
 
 def kendall_extinction(t, birth, death):
     """Probability that a linear birth-death lineage founded by one individual at
-    t[0] is extinct by each time in `t`, for a per-capita birth rate given on the
-    grid by `birth` and a constant per-capita death rate `death` (Kendall 1948):
-    rho(t) = death t - int_0^t birth, W(t) = 1 + int_0^t death e^{rho}, p0 = 1 - 1/W.
+    t[0] is extinct by each time in `t`, for per-capita birth and death rates given
+    on the grid (`death` may be a scalar):
+    rho(t) = int_0^t (death - birth), W(t) = 1 + int_0^t death e^{rho}, p0 = 1 - 1/W.
     """
     t = np.asarray(t, dtype=float)
-    rho = death * (t - t[0]) - cumulative_trapezoid(np.asarray(birth, dtype=float), t, initial=0.0)
-    W = 1.0 + cumulative_trapezoid(death * np.exp(rho), t, initial=0.0)
+    birth = np.broadcast_to(np.asarray(birth, dtype=float), t.shape)
+    death = np.broadcast_to(np.asarray(death, dtype=float), t.shape)
+    rho = cumulative_trapezoid(death - birth, t, initial=0.0)
+    W = 1.0 + cumulative_trapezoid(death * np.exp(np.minimum(rho, _EXP_CAP)), t, initial=0.0)
     return 1.0 - 1.0 / W
+
+
+def lineage_extinction_from(t, birth, death):
+    """Extinction probability by t[-1] of a lineage founded by one individual at
+    each grid time t[i], for per-capita rates `birth(t)`, `death(t)` on the grid.
+    Same formula as `kendall_extinction` with the integrals starting at t[i].
+    O(n^2); the grid step must be small against 1 / |birth - death| (trapezoid)."""
+    t = np.asarray(t, dtype=float)
+    birth = np.broadcast_to(np.asarray(birth, dtype=float), t.shape)
+    death = np.broadcast_to(np.asarray(death, dtype=float), t.shape)
+    G = cumulative_trapezoid(death - birth, t, initial=0.0)
+    p0 = np.empty(t.shape)
+    for i in range(t.size):
+        if i == t.size - 1:
+            p0[i] = 0.0  # no time left to die
+            continue
+        integrand = death[i:] * np.exp(np.minimum(G[i:] - G[i], _EXP_CAP))
+        p0[i] = 1.0 - 1.0 / (1.0 + np.trapezoid(integrand, t[i:]))
+    return p0
 
 
 def ctl_extinction_curve(p: Params, x0, t):
@@ -132,3 +162,24 @@ def immune_failure_probability(p: Params, x0, t_max=60.0, n=60001) -> float:
     """P(all x0[E] founding effector lineages die out) = p0(t_max)^E0."""
     t = np.linspace(0.0, t_max, n)
     return float(ctl_extinction_curve(p, x0, t)[-1] ** float(x0[E]))
+
+
+def mutant_lineage_rates(p: Params, T, E_t):
+    """Lumped birth and death rates of a mutant-infected-cell lineage in the
+    environment (T, E): birth p_m pi_m(T), death delta + k E."""
+    return p.pm * infection_probability(p.bm, p.cm, np.asarray(T, dtype=float)), p.delta + p.k * np.asarray(E_t, dtype=float)
+
+
+def establishment_probability_decaying_effectors(p: Params, x0, t_max=400.0, n=8001) -> float:
+    """P(establish) for x0 when the effectors are not yet activated and decay from
+    x0[E] at rate d_E while target cells stay at x0[T]: a wild-type cell lineage has
+    birth rate p_w (1 - mu) pi_w and death rate delta + k E0 e^{-d_E t} (Kendall).
+    The time grid is log-spaced so that the fast early decay of e^{rho} is resolved."""
+    x0 = np.asarray(x0, dtype=float)
+    t = np.concatenate([[0.0], np.logspace(-5, np.log10(t_max), n - 1)])
+    pi = infection_probability((1.0 - p.eps_b) * p.bw, p.cw, x0[T])
+    birth = (1.0 - p.eps_p) * p.pw * (1.0 - p.mu) * pi
+    death = p.delta + p.k * x0[E] * np.exp(-p.dE * t)
+    p0_cell = kendall_extinction(t, np.full(t.shape, birth), death)[-1]
+    q_virion = 1.0 - pi * (1.0 - p0_cell)
+    return float(1.0 - q_virion ** x0[VW] * p0_cell ** x0[IW])

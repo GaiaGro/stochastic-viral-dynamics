@@ -50,8 +50,25 @@ def test_stop_on_extinction_and_lineage_times():
     r = simulate(p, [1000, 0, 0, 50, 0, 2], np.linspace(0, 60, 601), seed_value=11, stop_on_extinction=True)
     assert r.stop_reason == STOP_EXTINCT and r.extinct
     assert r.t_ext[0] == pytest.approx(r.t_end)  # wild type died at the stopping time
-    assert np.isnan(r.t_ext[1])  # no mutant ever existed in this short run, or it died earlier
+    assert np.isnan(r.t_ext[1]) or r.t_ext[1] <= r.t_end  # mutant lineage, if it ever existed, died no later
     assert (r.X[r.t_grid > r.t_end] == -1).all() and (r.X[r.t_grid <= r.t_end] >= 0).all()
+
+
+def test_mutant_lineage_extinction_time_is_tracked():
+    """Start with mutant virions only and nothing else active except their clearance."""
+    p = ZERO.replace(cm=1.0)
+    r = simulate(p, [0, 0, 0, 0, 5, 0], [0.0, 50.0], seed_value=6, stop_on_extinction=True)
+    assert r.stopped == "extinct" and r.t_ext[1] == pytest.approx(r.t_end) and np.isnan(r.t_ext[0])
+
+
+def test_cap_met_at_start_stops_before_any_event():
+    r = simulate(ZERO.replace(lam=10.0), [100, 0, 0, 0, 0, 0], [0.0, 1.0], seed_value=1, stop_above=[50, 0, 0, 0, 0, 0])
+    assert r.stopped == "above" and r.n_events == 0 and r.t_end == 0.0
+
+
+def test_seed_must_fit_32_bits():
+    with pytest.raises(ValueError):
+        simulate(ZERO, [1, 0, 0, 0, 0, 0], [0.0, 1.0], seed_value=2**32)
 
 
 def test_stop_above_cap():

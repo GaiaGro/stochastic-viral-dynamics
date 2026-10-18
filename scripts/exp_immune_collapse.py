@@ -1,10 +1,12 @@
 """WP3 follow-up: what happens after an expanded effector response collapses.
 
-For every effector death rate of at least 0.5/day in the sweep of
+For every effector death rate of at least 0.1/day in the sweep of
 exp_immune_activation.py, reruns the same seeds (full model) to day 200 and records,
 for the two routes to activation failure, when the effectors died, how far they had
 pushed the infection down, and whether the virus was present at days 60 and 200.
-Writes results/immune_collapse.csv and .meta.json.
+The distribution of the peak effector count among failures is binned to show that
+the split at E_EXPANDED = 10 falls in an empty gap. Writes results/immune_collapse.csv
+and .meta.json.
 """
 
 import csv
@@ -66,7 +68,7 @@ def summarise(group):
 
 def main():
     started = time.time()
-    src = [r for r in csv.DictReader(open(SRC)) if r["sweep"] == "dE" and r["variant"] == "full" and float(r["dE"]) >= 0.5]
+    src = [r for r in csv.DictReader(open(SRC)) if r["sweep"] == "dE" and r["variant"] == "full" and float(r["dE"]) >= 0.09]
     set_point = solve_ode(BASE.replace(k=0.0), [T0, 0, 0, V0, 0, 0], np.linspace(0, T_LONG, 2001))[-1, 1:5].sum()
     one(0, BASE)
     rows = []
@@ -78,12 +80,17 @@ def main():
         cleared = [o for o, f in zip(out, fates) if f == "cleared"]
         early = [o for o, f in zip(out, fates) if f == "immune_failure" and o[4] < E_EXPANDED]
         collapse = [o for o, f in zip(out, fates) if f == "immune_failure" and o[4] >= E_EXPANDED]
+        peaks = np.array([o[4] for o, f in zip(out, fates) if f == "immune_failure"])
         row = {
             "dE": p.dE,
             "seed_start": seed_start,
             "n": N,
             "n_cleared": len(cleared),
             "n_cleared_effectors_never_expanded": int(sum(o[4] < E_EXPANDED for o in cleared)),
+            "n_fail_peakE_1": int((peaks == 1).sum()),
+            "n_fail_peakE_2_to_9": int(((peaks >= 2) & (peaks <= 9)).sum()),
+            "n_fail_peakE_10_to_99": int(((peaks >= 10) & (peaks <= 99)).sum()),
+            "n_fail_peakE_ge_100": int((peaks >= 100).sum()),
             "no_immune_set_point": float(set_point),
         }
         for name, group in (("early", early), ("collapse", collapse)):

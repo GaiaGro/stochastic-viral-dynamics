@@ -10,7 +10,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Rectangle
 
 from exp_resistance import BASE, EPS, SHOWCASE, T_TREAT
-from viraldyn import r0_wild_type
+from viraldyn import suppression_efficacy
 from viraldyn.plotting import BLUE_RAMP5, COLOR, DOUBLE, MUTED, SEQ_RAMP, TEXT, panel_label, save, setup
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,7 +45,7 @@ def main():
             ax_a.text(j, i, f"{100 * c['p_emerge']:.1f}%", ha="center", va="center", fontsize=7.5, color="white" if c["p_emerge"] > 0.55 else TEXT)
             if c["ode_takeover"]:
                 ax_a.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=COLOR["ode"], lw=1.6))
-    eps_star = 1.0 - 1.0 / r0_wild_type(BASE)
+    eps_star = suppression_efficacy(BASE)
     k = sum(e < eps_star for e in EPS) - 0.5
     ax_a.axhline(k, color=COLOR["ode"], ls="--", lw=0.9)
     ax_a.set_xticks(range(len(T_TREAT)))
@@ -58,21 +58,24 @@ def main():
     cb = fig.colorbar(im, ax=ax_a, fraction=0.046, pad=0.03)
     cb.set_label("P(resistance emerges)")
     cb.outline.set_visible(False)
-    ax_a.set_title(f"outlined: deterministic takeover\ndashed: $\\varepsilon^* = {eps_star:.2f}$, wild type suppressed above", fontsize=7.5, color=MUTED, loc="left")
+    ax_a.set_title(f"outlined: deterministic takeover\ndashed: $\\varepsilon^* = {eps_star:.3f}$, wild type suppressed above", fontsize=7.5, color=MUTED, loc="left")
     panel_label(ax_a, "a")
 
-    # (b) observed against the per-realisation theory band
+    # (b) observed against the per-realisation theory: marker = conditional on the observed
+    # wild-type survival time, thin line to the unconditional value
     ax_b.plot([0, 1], [0, 1], color=MUTED, lw=0.8, ls=":")
     for colour, e in zip(BLUE_RAMP5, EPS):
         sel = [cell[(tt, e)] for tt in T_TREAT]
-        lo = np.array([c["p_theory_low"] for c in sel])
-        hi = np.array([c["p_theory_high"] for c in sel])
+        x_cond = np.array([c["p_theory_cond"] for c in sel])
+        x_full = np.array([c["p_theory"] for c in sel])
         y = np.array([c["p_emerge"] for c in sel])
         yerr = np.vstack([y - [c["wilson_low"] for c in sel], [c["wilson_high"] for c in sel] - y])
-        ax_b.errorbar(hi, y, xerr=np.vstack([hi - lo, np.zeros_like(hi)]), yerr=yerr, fmt="o", color=colour, ecolor=colour, elinewidth=0.9, capsize=0, label=f"$\\varepsilon_\\beta = {e:g}$")
-    ax_b.set_xlim(-0.02, 1.02)
-    ax_b.set_ylim(-0.02, 1.02)
-    ax_b.set_xlabel("predicted P(resistance emerges)")
+        for xc, xf, yy in zip(x_cond, x_full, y):
+            ax_b.plot([xc, xf], [yy, yy], color=colour, lw=0.7, alpha=0.7)
+        ax_b.errorbar(x_cond, y, yerr=yerr, fmt="o", color=colour, ecolor=colour, elinewidth=0.9, capsize=0, label=f"$\\varepsilon_\\beta = {e:g}$")
+    ax_b.set_xlim(-0.02, 0.62)
+    ax_b.set_ylim(-0.02, 0.62)
+    ax_b.set_xlabel("predicted P(resistance emerges)\nmarker: given the wild type's survival time; line: unconditional")
     ax_b.set_ylabel("observed P(resistance emerges)")
     ax_b.legend(loc="upper left")
     panel_label(ax_b, "b")
@@ -81,10 +84,8 @@ def main():
     om = np.array([r["omega"] for r in sizes])
     y = np.array([r["p_emerge"] for r in sizes])
     yerr = np.vstack([y - [r["wilson_low"] for r in sizes], [r["wilson_high"] for r in sizes] - y])
-    lo = np.array([r["p_theory_low"] for r in sizes])
-    hi = np.array([r["p_theory_high"] for r in sizes])
-    ax_c.axhline(1.0, color=COLOR["ode"], ls="--", lw=1.2, label="deterministic (takeover in every case)")
-    ax_c.fill_between(om, lo, hi, color=MUTED, alpha=0.18, lw=0, label="theory band")
+    ax_c.axhline(1.0, color=COLOR["ode"], ls="--", lw=1.2, label="deterministic: takeover in every case")
+    ax_c.plot(om, [r["p_theory_cond"] for r in sizes], color=COLOR["theory"], lw=1.2, label="branching theory along the wild-type path")
     ax_c.errorbar(om, y, yerr=yerr, fmt="o", color=COLOR["mut"], ecolor=COLOR["mut"], elinewidth=0.9, capsize=0, label="simulation")
     ax_c.set_xscale("log")
     ax_c.set_xticks(om)

@@ -83,6 +83,13 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, 
     gi = 0
     n_events = 0
     stop = STOP_T_END
+    for i in range(N_SPECIES):  # a cap already met at t0 ends the run before any event
+        if stop_above[i] > 0 and x[i] >= stop_above[i]:
+            stop = STOP_ABOVE
+    if stop == STOP_ABOVE:
+        X[0, :] = x
+        C[0, :] = counts
+        return X, C, t, x, counts, n_events, t_ext, x_max, stop
     while True:
         propensities(x, p, a)
         a0 = 0.0
@@ -173,6 +180,8 @@ def simulate(
     if t_grid.ndim != 1 or t_grid.size < 1 or (np.diff(t_grid) <= 0).any():
         raise ValueError("t_grid must be strictly increasing")
     if seed_value is not None:
+        if not 0 <= int(seed_value) < 2**32:
+            raise ValueError("seed_value must fit in 32 bits; numba's generator wraps larger seeds silently")
         seed(int(seed_value))
     X, C, t, x, counts, n, t_ext, x_max, stop = _ssa(
         x0, p, STOICH, t_grid, bool(stop_on_extinction), int(stop_cum_infections), cap, int(max_events)

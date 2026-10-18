@@ -8,8 +8,9 @@ from viraldyn import PRESETS, immune_activation_threshold, r0_wild_type, solve_o
 from viraldyn.model import E, IM, IW, T, VM, VW
 from viraldyn.plotting import COLOR, DOUBLE, MUTED, panel_label, save, setup
 
+# Both start at the uninfected equilibrium of their preset (T* = lambda / d_T = 1000).
 SCENARIOS = (
-    ("chronic", [1000, 0, 0, 10, 0, 10], 100.0, "Chronic infection"),
+    ("resistance", [1000, 10, 0, 0, 0, 10], 150.0, "Chronic infection"),
     ("acute", [1000, 0, 0, 50, 0, 2], 60.0, "Acute infection: clearance"),
 )
 FLOOR = 0.5
@@ -28,17 +29,17 @@ def main():
         ax_cells.plot(t, y[:, IW], color=COLOR["wt"], label="infected, wild type $I_w$")
         ax_cells.plot(t, y[:, IM], color=COLOR["mut"], label="infected, mutant $I_m$")
         ax_cells.set_yscale("log")
-        ax_cells.set_ylim(FLOOR, 3e6 if name == "chronic" else 3e3)
+        ax_cells.set_ylim(FLOOR, 4 * y[:, T].max())
         ax_vir.plot(t, np.maximum(y[:, VW], FLOOR), color=COLOR["wt"], label="wild-type virions $V_w$")
         ax_vir.plot(t, np.maximum(y[:, VM], FLOOR), color=COLOR["mut"], label="mutant virions $V_m$")
         ax_vir.set_yscale("log")
-        ax_vir.set_ylim(FLOOR, 3e6 if name == "chronic" else 3e4)
+        ax_vir.set_ylim(FLOOR, 4 * y[:, VW].max())
         ax_eff.plot(t, np.maximum(y[:, E], FLOOR), color=COLOR["ctl"], label="effector cells $E$")
         ax_eff.set_yscale("log")
         ax_eff.set_xlabel("time (days)")
-        ax_cells.legend(loc="lower right" if name == "chronic" else "center right", fontsize=7)
+        ax_cells.legend(loc="lower right" if name == "resistance" else "center right", fontsize=7)
         ax_vir.legend(loc="upper right", fontsize=7)
-        ax_eff.legend(loc="lower right" if name == "chronic" else "upper right", fontsize=7)
+        ax_eff.legend(loc="lower right" if name == "resistance" else "upper right", fontsize=7)
         if col == 0:
             ax_cells.set_ylabel("cells")
             ax_vir.set_ylabel("virions")
