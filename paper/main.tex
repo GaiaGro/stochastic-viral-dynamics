@@ -1,0 +1,66 @@
+% Manuscript: one source, two builds.
+%   make            -> main.pdf (full: names, ORCIDs, code link) and main_anon.pdf (double-blind)
+% On Overleaf, uncomment the next line to get the double-blind build:
+% \def\ANONYMOUS{1}
+\documentclass[11pt,a4paper]{article}
+
+\newif\ifanon
+\ifdefined\ANONYMOUS\anontrue\fi
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[round,authoryear]{natbib}
+\usepackage{lineno}
+\usepackage[hidelinks]{hyperref}
+\usepackage{orcidlink}  % loads hyperref itself, so it must come after our options
+
+\graphicspath{{../figures/}{figures/}}
+\input{generated/numbers}
+
+% drafting aid: visible notes; remove before submission
+\newcommand{\note}[1]{\textcolor{gray}{\small [#1]}}
+
+\ifanon
+  \linenumbers
+  \title{Stochastic establishment, immune activation failure and the emergence of drug resistance in a two-strain within-host viral model}
+  \author{Anonymous authors \\ \small Affiliations withheld for double-blind review}
+  \date{}
+\else
+  \title{Stochastic establishment, immune activation failure and the emergence of drug resistance in a two-strain within-host viral model}
+  \author{Gaia Grossi\,\orcidlink{0009-0004-3192-1678} \and Leonardo Vanni\,\orcidlink{0009-0003-1869-9286}\thanks{Corresponding author. \note{email}} \\[2pt]
+    \small Bocconi University, Milan, Italy}
+  \date{\today}
+\fi
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\note{At most 250 words, standing on its own: the model, the three stochastic phenomena, the theory that predicts each, the deterministic prediction they contradict, and the reproducibility of the study.}
+\end{abstract}
+
+\noindent\textbf{Keywords:} within-host viral dynamics; Gillespie algorithm; branching process; drug resistance; immune activation; stochastic extinction
+
+\input{sections/01_introduction}
+\input{sections/02_model_methods}
+\input{sections/03_results}
+\input{sections/04_discussion}
+\input{sections/05_conclusion}
+\input{sections/06_backmatter}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix_a_parameters}
+\input{sections/appendix_b_derivations}
+
+\end{document}

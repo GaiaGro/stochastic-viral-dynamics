@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures clean exp-baseline exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
+.PHONY: help install lock test bench figures paper clean exp-baseline exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
 
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
@@ -8,6 +8,7 @@ help:
 	@echo "test               run the unit tests (about 20 s)"
 	@echo "bench              time the compiled SSA in each regime"
 	@echo "figures            rebuild every figure from the committed CSVs in results/"
+	@echo "paper              generated tables, figures, and both manuscript PDFs (paper/main.pdf, paper/main_anon.pdf)"
 	@echo "exp-baseline       rerun the SSA-versus-ODE validation ensemble (writes results/baseline_*)"
 	@echo "exp-establishment  rerun the establishment experiment (writes results/establishment.csv)"
 	@echo "exp-immune         rerun the immune-activation experiment (writes results/immune_activation.*)"
@@ -49,6 +50,9 @@ bench:
 
 figures:
 	@set -e; for f in scripts/fig*.py; do $(PY) "$$f"; done
+
+paper: figures
+	$(MAKE) -C paper PY=../$(PY)
 
 clean:
 	rm -rf .pytest_cache viraldyn/__pycache__ tests/__pycache__ scripts/__pycache__

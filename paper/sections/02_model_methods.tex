@@ -1,0 +1,32 @@
+\section{Model and methods}
+\label{sec:methods}
+
+\subsection{The model}
+\label{sec:model}
+
+\note{State $x = (T, I_w, I_m, V_w, V_m, E)$; the fifteen reaction channels as a table with propensities and state changes; mutation at production; drug as $(1-\varepsilon_\beta)$ on wild-type infection; chemical master equation and its deterministic limit $\dot x = S\,a(x)$ (the six ODEs).}
+
+\subsection{Deterministic thresholds}
+\label{sec:thresholds}
+
+\note{$R_0$ with virion consumption; the exact suppression efficacy $\varepsilon^* = \EpsStar$ for the resistance preset; the activation threshold $I^* = d_E/q$, which is also the chronic set point of infected cells; why set points of one or two cells are continuous-variable artefacts (Appendix~\ref{app:derivations}).}
+
+\subsection{Exact stochastic simulation}
+\label{sec:ssa}
+
+\note{Gillespie direct method, compiled; recording on a time grid; lineage extinction times; early stops; seeds; agreement with the deterministic solution at large populations (Figure~\ref{fig:validation}).}
+
+\subsection{Branching-process and birth--death approximations}
+\label{sec:theory}
+
+\note{(i) Two-type generating-function fixed point for establishment with fixed effectors, closed form $\pi(1 - 1/R_0)$. (ii) Kendall's formula for a linear birth--death lineage with time-varying rates \citep{kendall1948generalized}: the effector lineage forced by the infected-cell load; the mutant lineage along the wild-type-only path, lumped rates $p_m \pi_m(T(t))$ and $\delta + kE(t)$; conditioning on the observed wild-type survival time. Derivations in Appendix~\ref{app:derivations}.}
+
+\subsection{Parameter sets and experimental design}
+\label{sec:design}
+
+\note{Table~\ref{tab:presets}: the presets, all started from the uninfected equilibrium $T^*$; which figure uses which. Why the resistance preset replaces the notebook's therapy preset (viability). Outcome definitions: established (100 cumulative infections before extinction), immune activation failure, cleared, emerged (100 mutant infection events under therapy), persistence at a horizon; the sensitivity checks on each threshold. Number of realisations and Wilson intervals \citep{wilson1927probable}.}
+
+\subsection{Reproducibility}
+\label{sec:repro}
+
+\note{Code, seeds, committed results, figures rebuilt from results in continuous integration; software \citep{lam2015numba,harris2020array,virtanen2020scipy,hunter2007matplotlib}. Link withheld in the anonymised build.}
