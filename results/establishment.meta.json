@@ -1,0 +1,17 @@
+{
+ "date": "2026-10-18T08:30:00+00:00",
+ "elapsed_s": 2.5,
+ "git_commit": "dc0219e42c5336d7122850e2118eb57ec04358ce",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_establishment.py",
+ "n_per_condition": 2000,
+ "threshold": 100,
+ "t_max": 500.0,
+ "argv": [
+  "scripts/exp_establishment.py"
+ ]
+}

@@ -119,6 +119,12 @@ Each CSV row carries its seed. No notebook in the final repo except an optional
   SSA points with Wilson intervals, inset with example trajectories.
 - Also report the R0 of the course notebook's establishment parameter set (33) to
   make the point that the old result could not have been bottleneck extinction.
+- Status 2026-10-18: done. `viraldyn/theory.py` (two-type generating-function
+  fixed point, closed form pi (1 - 1/R0) for one virion), `scripts/exp_establishment.py`
+  (68 conditions x 2000 runs, 2 s on 16 cores), `scripts/fig4_establishment.py`.
+  Theory falls inside the 95 percent interval in 64 of 68 conditions, pooled z = -0.17,
+  largest absolute deviation 0.034. Panel (b) adds the R0 sweep for V0 in {1, 5}
+  against the deterministic step.
 
 ### WP3 Immune activation failure. ~1 day theory, 0.5 day compute.
 - Phenomenon: with E0 small, q I(t) E versus d_E E is a time-inhomogeneous linear

@@ -24,6 +24,8 @@ make figures     # rebuild every figure from the committed CSVs in results/
 |---|---|
 | `viraldyn/model.py` | state, 15 reaction channels, stoichiometry, propensities, ODE limit, R0 formulas, parameter presets |
 | `viraldyn/ssa.py` | numba-compiled Gillespie direct method with fixed-grid recording, lineage extinction times, early stopping |
+| `viraldyn/theory.py` | branching-process extinction and establishment probabilities (two-type generating functions, closed form for one virion) |
+| `viraldyn/ensembles.py`, `stats.py`, `plotting.py` | seeded process-pool runner with provenance metadata, Wilson intervals, shared figure style |
 | `tests/` | stoichiometry and ODE-network consistency, R0 against the next-generation matrix, exact distributions, agreement with the original pure-Python simulator |
 | `scripts/` | one script per figure (`fig*.py`) plus `bench_ssa.py` |
 | `results/` | committed CSVs that every figure and every number in the paper is read from |

@@ -1,14 +1,18 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures clean
+.PHONY: help install lock test bench figures clean exp-establishment
 
 help:
-	@echo "install  create .venv with uv and install requirements.txt"
-	@echo "lock     write requirements-lock.txt from the current .venv"
-	@echo "test     run the unit tests (about 1 min)"
-	@echo "bench    time the compiled SSA in each regime"
-	@echo "figures  rebuild every figure from the committed CSVs in results/"
-	@echo "clean    remove generated figures and caches"
+	@echo "install            create .venv with uv and install requirements.txt"
+	@echo "lock               write requirements-lock.txt from the current .venv"
+	@echo "test               run the unit tests (about 1 min)"
+	@echo "bench              time the compiled SSA in each regime"
+	@echo "figures            rebuild every figure from the committed CSVs in results/"
+	@echo "exp-establishment  rerun the establishment experiment (writes results/establishment.csv)"
+	@echo "clean              remove generated figures and caches"
+
+exp-establishment:
+	$(PY) scripts/exp_establishment.py
 
 install:
 	uv venv .venv --python 3.12
