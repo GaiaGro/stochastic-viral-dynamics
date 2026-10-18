@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures clean exp-establishment exp-immune exp-immune-collapse exp-resistance
+.PHONY: help install lock test bench figures clean exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
 
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
@@ -12,6 +12,7 @@ help:
 	@echo "exp-immune         rerun the immune-activation experiment (writes results/immune_activation.*)"
 	@echo "exp-immune-collapse  follow collapsed responses to day 200 (writes results/immune_collapse.csv)"
 	@echo "exp-resistance     rerun the therapy grid (writes results/resistance*.csv and the Figure 6 ensemble)"
+	@echo "exp-regime-map     rerun the stochastic regime map (writes results/regime_map.csv)"
 	@echo "clean              remove generated figures and caches"
 
 exp-establishment:
@@ -25,6 +26,9 @@ exp-immune-collapse:
 
 exp-resistance:
 	$(PY) scripts/exp_resistance.py
+
+exp-regime-map:
+	$(PY) scripts/exp_regime_map.py
 
 install:
 	uv venv .venv --python 3.12

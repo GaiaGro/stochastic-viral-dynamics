@@ -219,6 +219,19 @@ overnight, 1 day analysis.
   small-population parameter set so runs cost milliseconds. Overlay R0 = 1 and the
   deterministic clearance boundary. Report that the deterministic boundary is a
   level set of a continuous probability, not a sharp line.
+- Status 2026-10-18: done. 25 x 25 log grid, beta_w in [1e-5, 1e-1], k in [1e-3, 10],
+  N = 200, start 5 virions and 10 effectors, establishment preset. Two maps:
+  (1) with the preset's q = 0.1 the chronic set point is I* = d_E/q = 1 infected
+  cell, so not one of 125,000 realisations persists to day 200 while the
+  deterministic model calls 131 cells chronic (results/regime_map_notebook_q.csv);
+  (2) the main map lowers q to 0.002 (I* = 50): the deterministic model then calls
+  370 cells chronic and none cleared, while stochastically 156 of those 370 never
+  persist, 97 persist with intermediate probability and only 117 persist in more
+  than 95 percent of runs (results/regime_map.csv). Establishment is smeared over
+  about a decade of beta around R_eff = 1 and follows the branching contour; the
+  notebook's vertical R0 = 1 line ignores the initial effectors, which shift the
+  threshold by a factor 1 + k E0 / delta. Figure 8: establishment map, persistence
+  map, transect at k = 0.1. Whole experiment 78 s.
 
 ### WP6 Fix carried-over errors. ~0.5 day.
 - Scenario (B) heading says chronic. "Single drug cART" contradiction. Mutant

@@ -1,0 +1,136 @@
+"""WP5: stochastic regime map over wild-type infectivity and effector killing rate.
+
+The course notebook classified the (beta_w, k) plane with the deterministic model
+alone: extinction if R0 < 1, clearance if the viral load fell below one at day
+1000, chronic otherwise. Here each cell of a 25 x 25 log grid gets N exact
+realisations from 5 wild-type virions and 10 effectors in the "establishment"
+preset (T* = 1000) and two probabilities are recorded:
+
+  establishment   100 cumulative infection events before extinction
+  persistence     infected cells or virions still present at day 200
+
+together with the deterministic classification on the same horizon, the
+effective reproduction number with the initial effectors present,
+R_eff = R0 delta / (delta + k E0), and the branching-process establishment
+probability.
+
+Two maps are written. With the preset's proliferation rate q = 0.1 the chronic
+set point is I* = d_E / q = 1 infected cell, so every realisation that
+establishes is cleared by day 200 and the deterministic chronic region does not
+exist stochastically (results/regime_map_notebook_q.csv). The main map
+(results/regime_map.csv) lowers q to 0.002 so that I* = 50 and persistence has a
+genuine boundary.
+"""
+
+import csv
+import sys
+import time
+from functools import partial
+from pathlib import Path
+
+import numpy as np
+
+from viraldyn import PRESETS, simulate, solve_ode
+from viraldyn.ensembles import provenance, run_seeds, write_meta
+from viraldyn.model import E, target_cell_equilibrium
+from viraldyn.ssa import STOP_EXTINCT
+from viraldyn.stats import wilson
+from viraldyn.theory import establishment_probability, infection_probability
+
+ROOT = Path(__file__).resolve().parents[1]
+Q_MAIN = 0.002  # chronic set point I* = d_E / q = 50 infected cells
+Q_NOTEBOOK = 0.1  # the preset's value: I* = 1
+MAPS = {Q_MAIN: ROOT / "results" / "regime_map.csv", Q_NOTEBOOK: ROOT / "results" / "regime_map_notebook_q.csv"}
+BASE = PRESETS["establishment"].replace(q=Q_MAIN)
+X0 = [1000, 0, 0, 5, 0, 10]
+BETA = np.logspace(-5, -1, 25)
+K = np.logspace(-3, 1, 25)
+N = 200
+T_END = 200.0
+THRESHOLD = 100
+E_CAP = 10_000_000  # safety only; nothing in this grid is expected to reach it
+
+
+def params(beta, k, q=Q_MAIN):
+    return BASE.replace(bw=float(beta), bm=0.8 * float(beta), k=float(k), q=float(q))
+
+
+def r_eff(p, E0):
+    """Reproduction number of the wild type with E0 effectors present from the start."""
+    pi = infection_probability(p.bw, p.cw, target_cell_equilibrium(p))
+    return pi * p.pw * (1.0 - p.mu) / (p.delta + p.k * E0)
+
+
+def k_threshold(beta, E0, p=BASE):
+    """Killing rate at which R_eff = 1 for a given infectivity; nan where even k = 0 gives R_eff < 1."""
+    pi = infection_probability(beta, p.cw, target_cell_equilibrium(p))
+    k = (pi * p.pw * (1.0 - p.mu) - p.delta) / E0
+    return np.where(k > 0, k, np.nan)
+
+
+def one(seed, p):
+    r = simulate(p, X0, [0.0, T_END], seed_value=seed, stop_on_extinction=True, stop_above=[0, 0, 0, 0, 0, E_CAP])
+    established = r.cumulative_infections >= THRESHOLD
+    persist = r.stop_reason != STOP_EXTINCT
+    return established, persist, int(r.x_end[E]) == 0
+
+
+def deterministic(p):
+    t = np.linspace(0.0, T_END, 2001)
+    ode = solve_ode(p, X0, t)
+    load = ode[:, 1:5].sum(axis=1)
+    return float(load.max()), float(load[-1])
+
+
+def classify_ode(peak, end, v0=X0[3]):
+    if end >= 1.0:
+        return "chronic"
+    return "cleared" if peak >= 10.0 * v0 else "extinction"
+
+
+def run_map(q, seed):
+    rows = []
+    for k in K:
+        for beta in BETA:
+            p = params(beta, k, q)
+            out = run_seeds(partial(one, p=p), range(seed, seed + N))
+            est = sum(o[0] for o in out)
+            per = sum(o[1] for o in out)
+            peak, end = deterministic(p)
+            lo_e, hi_e = wilson(est, N)
+            lo_p, hi_p = wilson(per, N)
+            rows.append({
+                "bw": float(beta), "k": float(k), "q": float(q),
+                "R0_wt": r_eff(p, 0.0), "R_eff": r_eff(p, X0[5]),
+                "n": N, "n_established": est, "n_persist": per, "n_effectors_extinct": sum(o[2] for o in out),
+                "p_est": est / N, "p_est_low": float(lo_e), "p_est_high": float(hi_e),
+                "p_persist": per / N, "p_persist_low": float(lo_p), "p_persist_high": float(hi_p),
+                "p_est_theory": establishment_probability(p, X0),
+                "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(peak, end),
+                "seed_start": seed,
+            })
+            seed += N
+    return rows, seed
+
+
+def main():
+    started = time.time()
+    one(0, params(1e-3, 0.1))
+    seed = 4_000_000
+    for q, out in MAPS.items():
+        rows, seed = run_map(q, seed)
+        with open(out, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+        write_meta(out.with_suffix(".meta.json"), provenance(started, script=Path(__file__).name, q=q, n_per_cell=N, threshold=THRESHOLD, t_end=T_END, x0=X0, argv=sys.argv))
+        classes = {c: sum(r["ode_class"] == c for r in rows) for c in ("extinction", "cleared", "chronic")}
+        mixed_est = sum(0.05 < r["p_est"] < 0.95 for r in rows)
+        mixed_per = sum(0.05 < r["p_persist"] < 0.95 for r in rows)
+        persist_any = sum(r["p_persist"] > 0 for r in rows)
+        print(f"q={q}: {len(rows)} cells, {time.time() - started:.0f} s elapsed; deterministic classes {classes}; "
+              f"cells with intermediate establishment {mixed_est}, intermediate persistence {mixed_per}, any persistence {persist_any}")
+
+
+if __name__ == "__main__":
+    main()
