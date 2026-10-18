@@ -20,6 +20,8 @@ COLOR = {
     "theory": "#0b0b0b",
 }
 BLUE_RAMP = ("#86b6ef", "#3987e5", "#1c5cab", "#0d366b")  # light to dark, validated ordinal
+BLUE_RAMP5 = ("#86b6ef", "#5598e7", "#2a78d6", "#1c5cab", "#0d366b")  # five ordered levels, validated
+SEQ_RAMP = ("#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b")  # continuous magnitude
 TEXT = "#0b0b0b"
 MUTED = "#52514e"
 GRID = "#dedcd7"

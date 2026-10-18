@@ -1,0 +1,5 @@
+dE,n,seed_start,collapse_median_load_day200_survivors,collapse_median_load_day60,collapse_median_min_load_before_death,collapse_median_peak_E,collapse_median_t_effector_death,collapse_n,collapse_n_extinct_by_day200,early_median_load_day200_survivors,early_median_load_day60,early_median_min_load_before_death,early_median_peak_E,early_median_t_effector_death,early_n,early_n_extinct_by_day200,n_cleared,n_cleared_effectors_never_expanded,no_immune_set_point
+0.5334838230116767,2000,2040000,,,,,,0,,113.0,115.0,38.0,1.0,0.21798546926161155,362,0,1276,0,116.89737408616149
+0.9486832980505137,2000,2042000,,,,,,0,,117.0,116.0,66.0,1.0,0.21583117398558757,607,0,1005,0,116.89737408616149
+1.687023975571047,2000,2044000,119.0,112.0,1.0,645.0,8.187338678561241,53,0,116.0,114.0,44.0,1.0,0.20329846650753197,916,0,658,0,116.89737408616149
+3.0,2000,2046000,118.0,114.0,6.0,606.5,3.5046418100243013,256,0,118.0,116.0,75.5,1.0,0.16415304224956995,1209,0,128,0,116.89737408616149

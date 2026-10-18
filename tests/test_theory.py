@@ -24,6 +24,18 @@ def test_single_virion_matches_closed_form():
         assert 1.0 - q.q_Vm == pytest.approx(single_virion_closed_form(pm, 1000.0, E0), abs=1e-9)
 
 
+def test_mutant_closed_form_matches_fixed_point():
+    from viraldyn.theory import mutant_lineage_probabilities
+
+    p = PRESETS["therapy"]
+    for T, E0 in ((1000.0, 0.0), (1000.0, 50.0), (300.0, 10.0), (1000.0, 400.0)):
+        q = extinction_probabilities(p, T=T, E_fixed=E0)
+        qV, qI = mutant_lineage_probabilities(p, T, E0)
+        assert float(qV) == pytest.approx(q.q_Vm, abs=1e-9) and float(qI) == pytest.approx(q.q_Im, abs=1e-9)
+    qV, qI = mutant_lineage_probabilities(p, [1000.0, 100.0], [0.0, 500.0])  # vectorised; second is subcritical
+    assert qV.shape == (2,) and qV[1] == 1.0 and qI[1] == 1.0 and qV[0] < 1.0
+
+
 def test_subcritical_lineages_die_out():
     p = P.replace(bw=1e-5, bm=1e-5, mu=0.0)  # R0 far below 1
     assert r0_wild_type(p) < 1

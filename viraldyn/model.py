@@ -177,9 +177,18 @@ PRESETS = {
         lam=10.0, dT=0.01, bw=0.02, bm=0.016, pw=20.0, pm=20.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=0.5, k=0.1, q=0.1, dE=0.1,
     ),
-    # notebook section 3.3, deterministic competitive release
+    # notebook section 3.3, deterministic competitive release. Its deterministic chronic
+    # infection passes through 3e-8 virions at the first trough; stochastically the
+    # infection dies there in every realisation, so it is not used for the therapy grid.
     "therapy": Params.make(
         lam=100.0, dT=0.1, bw=2e-4, bm=1.6e-4, pw=100.0, pm=100.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=1.0, k=0.01, q=0.05, dE=0.1,
+    ),
+    # "therapy" with a slower, weaker effector response (q, k) so that the chronic set
+    # point (I* = d_E / q = 50 infected cells, about 1200 virions) is stochastically
+    # viable while a mutant lineage is present only part of the time. Same R0 values.
+    "resistance": Params.make(
+        lam=100.0, dT=0.1, bw=2e-4, bm=1.6e-4, pw=100.0, pm=100.0, mu=1e-4,
+        cw=4.0, cm=4.0, delta=1.0, k=0.003, q=0.002, dE=0.1,
     ),
 }

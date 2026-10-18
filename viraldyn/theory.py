@@ -74,6 +74,24 @@ def establishment_probability(p: Params, x0, T=None, E_fixed=None) -> float:
     return float(1.0 - np.exp(log_ext))
 
 
+def mutant_lineage_probabilities(p: Params, T, E_fixed=0.0):
+    """Closed-form extinction probabilities (q_Vm, q_Im) of lineages founded by one
+    mutant virion or one mutant-infected cell, vectorised over `T` and `E_fixed`.
+
+    The mutant only produces mutants, so it is a one-type process: a virion founds a
+    surviving lineage with probability pi_m (1 - 1/R_m) when R_m = pi_m p_m / d > 1,
+    with d = delta + k E, and never otherwise.
+    """
+    T = np.asarray(T, dtype=float)
+    E_fixed = np.asarray(E_fixed, dtype=float)
+    d = p.delta + p.k * E_fixed
+    pi = infection_probability(p.bm, p.cm, T)
+    R = pi * p.pm / d
+    u_V = np.where(R > 1.0, pi * (1.0 - 1.0 / np.maximum(R, 1e-300)), 0.0)
+    q_I = d / (d + p.pm * u_V)
+    return 1.0 - u_V, q_I
+
+
 def single_virion_closed_form(p: Params, T, E_fixed=0.0) -> float:
     """P(establish from one wild-type virion) for mu = 0: pi (1 - 1/R0), or 0 if R0 <= 1."""
     d = p.delta + p.k * E_fixed

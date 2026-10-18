@@ -27,7 +27,8 @@ make figures     # rebuild every figure from the committed CSVs in results/
 | `viraldyn/theory.py` | branching-process extinction and establishment probabilities (two-type generating functions, closed form for one virion) |
 | `viraldyn/ensembles.py`, `stats.py`, `plotting.py` | seeded process-pool runner with provenance metadata, Wilson intervals, shared figure style |
 | `tests/` | stoichiometry and ODE-network consistency, R0 against the next-generation matrix, exact distributions, agreement with the original pure-Python simulator |
-| `scripts/` | one script per figure (`fig*.py`) plus `bench_ssa.py` |
+| `scripts/exp_*.py` | one script per experiment; each writes CSVs plus a `.meta.json` with the git commit, seeds and timing (`make exp-<name>`) |
+| `scripts/fig*.py` | one script per figure, reading only the committed results (`make figures`) |
 | `results/` | committed CSVs that every figure and every number in the paper is read from |
 | `paper/` | LaTeX sources |
 

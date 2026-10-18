@@ -1,0 +1,26 @@
+{
+ "date": "2026-10-18T09:45:31+00:00",
+ "elapsed_s": 607.9,
+ "git_commit": "5fa49c953174a00dbbd809d45ae36305502e3b22",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_resistance.py",
+ "preset": "resistance",
+ "n_per_cell": 1000,
+ "threshold": 100,
+ "horizon": 120.0,
+ "x0": [
+  1000,
+  10,
+  0,
+  0,
+  0,
+  10
+ ],
+ "argv": [
+  "scripts/exp_resistance.py"
+ ]
+}

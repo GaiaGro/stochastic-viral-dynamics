@@ -1,0 +1,16 @@
+{
+ "date": "2026-10-18T09:26:36+00:00",
+ "elapsed_s": 3.6,
+ "git_commit": "5fa49c953174a00dbbd809d45ae36305502e3b22",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_immune_collapse.py",
+ "t_long": 200.0,
+ "t_classify": 60.0,
+ "argv": [
+  "scripts/exp_immune_collapse.py"
+ ]
+}

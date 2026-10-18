@@ -182,6 +182,36 @@ overnight, 1 day analysis.
   establishing. Choose the pre-treatment inoculum (or use the chronic preset, as the
   notebook's stochastic therapy section did) so that establishment is near certain,
   and say why in Methods.
+- Status 2026-10-18: done, with design changes forced by the data.
+  (1) The notebook's therapy preset is not stochastically viable: its deterministic
+  chronic infection passes through 3e-8 virions at the first trough (day 17.5) and
+  none of 1000 realisations survives to day 100, even from the deterministic set
+  point (2 infected cells). The deterministic competitive-release figure of the
+  notebook therefore rests on a trajectory that would have ended in clearance.
+  Recorded in results/preset_viability.csv. (2) New "resistance" preset: same R0
+  (4.8 wild type, 3.9 mutant, suppression threshold eps* = 0.79), slower and weaker
+  effector response (q = 0.002, k = 0.003) so that the set point is I* = d_E/q = 50
+  infected cells and about 1200 virions; all 1000 realisations survive 100 days and a
+  mutant lineage is present at day 30 in about 15 percent of them. Start state: 10
+  infected cells, 10 effectors. (3) Grid t_treat in {5,10,20,30,50} x eps in
+  {0.5,0.7,0.8,0.9,0.99}, N = 1000, horizon 120 days, emergence = 100 mutant infection
+  events during therapy. The deterministic model predicts mutant takeover in all 25
+  cells. Stochastically: below 2 percent whenever the drug suppresses the wild type
+  (eps >= 0.8; cure in 98 to 100 percent of runs), 23 to 29 percent at eps = 0.5
+  where the wild type persists and keeps producing mutants that are fitter under
+  drug (slow replacement, median 60 days), 5 to 8 percent at eps = 0.7. (4) Theory
+  per realisation uses the wild-type-only deterministic path as the environment
+  (the first version used the path with the mutant in it and underpredicted five
+  times). It matches at eps >= 0.8 and eps = 0.5 and fails at eps = 0.7 (predicts 42
+  percent) because there the drug pushes the wild type itself through a trough it
+  survives in only 6 percent of realisations, so the de novo supply the theory
+  assumes never materialises. Say this plainly in the paper. (5) System-size sweep at
+  (30, 0.9) scaling lam, 1/beta, 1/q, 1/k and the state by Omega in {1,3,10,30,100}:
+  P(emergence) 0.8, 1.4, 6.8, 21, 52 percent, inside the theory band at every size;
+  cure still 48 percent at Omega = 100. Files: scripts/exp_resistance.py (10 min on
+  16 cores, dominated by the Omega = 100 runs), scripts/fig6_competitive_release.py,
+  scripts/fig7_resistance.py, tests/test_resistance.py, results/resistance*.csv,
+  results/competitive_release_ensemble.npz, results/preset_viability.csv.
 
 ### WP5 Stochastic regime map. ~0.5 day.
 - Replace the deterministic beta x k classification with P(establishment at day 30)
