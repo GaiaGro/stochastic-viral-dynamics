@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures clean exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
+.PHONY: help install lock test bench figures clean exp-baseline exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
 
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
@@ -8,12 +8,16 @@ help:
 	@echo "test               run the unit tests (about 1 min)"
 	@echo "bench              time the compiled SSA in each regime"
 	@echo "figures            rebuild every figure from the committed CSVs in results/"
+	@echo "exp-baseline       rerun the SSA-versus-ODE validation ensemble (writes results/baseline_*)"
 	@echo "exp-establishment  rerun the establishment experiment (writes results/establishment.csv)"
 	@echo "exp-immune         rerun the immune-activation experiment (writes results/immune_activation.*)"
 	@echo "exp-immune-collapse  follow collapsed responses to day 200 (writes results/immune_collapse.csv)"
 	@echo "exp-resistance     rerun the therapy grid (writes results/resistance*.csv and the Figure 6 ensemble)"
 	@echo "exp-regime-map     rerun the stochastic regime map (writes results/regime_map.csv)"
 	@echo "clean              remove generated figures and caches"
+
+exp-baseline:
+	$(PY) scripts/exp_baseline.py
 
 exp-establishment:
 	$(PY) scripts/exp_establishment.py

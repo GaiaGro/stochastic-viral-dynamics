@@ -1,0 +1,33 @@
+{
+ "date": "2026-10-18T10:37:32+00:00",
+ "elapsed_s": 6.6,
+ "git_commit": "c6915fd5de66450c232fd672e77a9f9ff9a741a7",
+ "code_dirty": true,
+ "numba": "0.68.0",
+ "numpy": "2.5.4",
+ "python": "3.12.3",
+ "cpu_count": 16,
+ "script": "exp_baseline.py",
+ "preset": "chronic",
+ "n": 200,
+ "t_end": 60.0,
+ "x0": [
+  1000,
+  5,
+  0,
+  30,
+  0,
+  10
+ ],
+ "phase_x0": [
+  1000,
+  10,
+  0,
+  100,
+  0,
+  10
+ ],
+ "argv": [
+  "scripts/exp_baseline.py"
+ ]
+}

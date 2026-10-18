@@ -238,6 +238,20 @@ overnight, 1 day analysis.
   described as pre-existing while the initial state has none; decide one story and
   make initial conditions match it. Single definition of the ODE right-hand side
   with explicit non-negativity handling. Fixed seeds everywhere.
+- Status 2026-10-18: done. Every correction, with the file that carries the
+  evidence, is in `paper/notebook_corrections.md` (ten items; two new ones found on
+  the way: the notebook redefined `params_chronic` three times and the last
+  definition removed the mutant's fitness cost, which is where the printed
+  R0(Mut) = 30 and the stochastic therapy ensemble came from; and the chronic set
+  point equals the activation threshold d_E/q, so the notebook's presets with
+  thresholds of 1 or 2 cells have no stochastically viable chronic state). The two
+  baseline figures the paper needs are done: Figure 2 (deterministic chronic and
+  acute regimes, `scripts/fig2_deterministic.py`, ODE only) and Figure 3 (200
+  realisations of the chronic preset against the ODE plus the phase plane,
+  `scripts/exp_baseline.py`, `scripts/fig3_validation.py`,
+  `results/baseline_validation.csv`: the ODE lies inside the 5 to 95 percent band at
+  every time for T, Iw, Vw and E, with the median within 0.16 in log10; the
+  mutant, at 0.003 to 38 virions in the ODE, is where the two descriptions part).
 
 ## 4. Tests (pytest, run in CI)
 
