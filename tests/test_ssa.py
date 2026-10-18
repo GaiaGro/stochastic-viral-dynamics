@@ -54,6 +54,14 @@ def test_stop_on_extinction_and_lineage_times():
     assert (r.X[r.t_grid > r.t_end] == -1).all() and (r.X[r.t_grid <= r.t_end] >= 0).all()
 
 
+def test_stop_above_cap():
+    p = ZERO.replace(lam=1000.0)  # pure immigration of target cells
+    r = simulate(p, [0, 0, 0, 0, 0, 0], np.linspace(0, 10, 11), seed_value=4, stop_above=[50, 0, 0, 0, 0, 0])
+    assert r.stopped == "above" and r.x_end[0] == 50 and r.t_end < 1.0
+    with pytest.raises(ValueError):
+        simulate(p, [0, 0, 0, 0, 0, 0], [0.0, 1.0], stop_above=[1, 2, 3])
+
+
 def test_stop_on_cumulative_infections():
     r = simulate(PRESETS["chronic"], [1000, 5, 0, 30, 0, 10], np.linspace(0, 60, 61), seed_value=2, stop_cum_infections=100)
     assert r.stopped == "cum_infections" and r.C.max() >= 0

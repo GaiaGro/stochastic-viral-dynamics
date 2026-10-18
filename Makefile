@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: help install lock test bench figures clean exp-establishment
+.PHONY: help install lock test bench figures clean exp-establishment exp-immune
 
 help:
 	@echo "install            create .venv with uv and install requirements.txt"
@@ -9,10 +9,14 @@ help:
 	@echo "bench              time the compiled SSA in each regime"
 	@echo "figures            rebuild every figure from the committed CSVs in results/"
 	@echo "exp-establishment  rerun the establishment experiment (writes results/establishment.csv)"
+	@echo "exp-immune         rerun the immune-activation experiment (writes results/immune_activation.*)"
 	@echo "clean              remove generated figures and caches"
 
 exp-establishment:
 	$(PY) scripts/exp_establishment.py
+
+exp-immune:
+	$(PY) scripts/exp_immune_activation.py
 
 install:
 	uv venv .venv --python 3.12

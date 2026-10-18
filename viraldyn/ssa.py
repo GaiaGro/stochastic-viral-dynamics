@@ -17,7 +17,8 @@ STOP_EXTINCT = 1
 STOP_CUM_INFECTIONS = 2
 STOP_MAX_EVENTS = 3
 STOP_NO_REACTIONS = 4
-STOP_REASONS = ("t_end", "extinct", "cum_infections", "max_events", "no_reactions")
+STOP_ABOVE = 5
+STOP_REASONS = ("t_end", "extinct", "cum_infections", "max_events", "no_reactions", "above")
 
 # lineages tracked for extinction times
 WT, MUT, CTL = range(3)
@@ -31,6 +32,7 @@ class SSAResult:
     C: np.ndarray  # (n, 15) cumulative reaction counts at each grid time; -1 after stop
     t_end: float  # time at which the run stopped
     x_end: np.ndarray  # (6,) state at t_end
+    c_end: np.ndarray  # (15,) cumulative reaction counts at t_end
     n_events: int
     t_ext: np.ndarray  # (3,) first extinction time of (wt, mut, ctl) lineage, nan if never
     x_max: np.ndarray  # (6,) running maximum of each species
@@ -44,6 +46,10 @@ class SSAResult:
     def extinct(self) -> bool:
         """No infected cells and no free virus at the end of the run."""
         return int(self.x_end[1:5].sum()) == 0
+
+    @property
+    def cumulative_infections(self) -> int:
+        return int(self.c_end[0] + self.c_end[1])
 
 
 @njit(cache=True)
@@ -60,7 +66,7 @@ def _lineage_sizes(x, out):
 
 
 @njit(cache=True)
-def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, max_events):
+def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, max_events):
     n_grid = t_grid.shape[0]
     x = x0.copy()
     X = np.full((n_grid, N_SPECIES), -1, np.int64)
@@ -126,10 +132,15 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, max_events):
         if stop_cum_infections > 0 and counts[0] + counts[1] >= stop_cum_infections:
             stop = STOP_CUM_INFECTIONS
             break
+        for i in range(N_SPECIES):
+            if stop_above[i] > 0 and x[i] >= stop_above[i]:
+                stop = STOP_ABOVE
+        if stop == STOP_ABOVE:
+            break
         if n_events >= max_events:
             stop = STOP_MAX_EVENTS
             break
-    return X, C, t, x, n_events, t_ext, x_max, stop
+    return X, C, t, x, counts, n_events, t_ext, x_max, stop
 
 
 def simulate(
@@ -139,25 +150,31 @@ def simulate(
     seed_value=None,
     stop_on_extinction=False,
     stop_cum_infections=0,
+    stop_above=None,
     max_events=np.iinfo(np.int64).max,
 ) -> SSAResult:
     """One exact realisation from state `x0` recorded at the times in `t_grid`.
 
     `stop_on_extinction` ends the run when no infected cell or virion of either
     strain is left. `stop_cum_infections` ends it when the cumulative number of
-    infection events reaches that value (0 disables). Grid rows after an early
-    stop hold -1.
+    infection events reaches that value (0 disables). `stop_above` is a per-species
+    cap (6 integers, 0 disables) that ends the run as soon as a species reaches it,
+    for example to stop an effector population that nothing limits. Grid rows after
+    an early stop hold -1.
     """
     p = Params(*map(float, p))
     x0 = np.asarray(x0, dtype=np.int64)
     t_grid = np.asarray(t_grid, dtype=np.float64)
+    cap = np.zeros(N_SPECIES, dtype=np.int64) if stop_above is None else np.asarray(stop_above, dtype=np.int64)
     if x0.shape != (N_SPECIES,) or (x0 < 0).any():
         raise ValueError("x0 must be 6 non-negative integers")
+    if cap.shape != (N_SPECIES,) or (cap < 0).any():
+        raise ValueError("stop_above must be 6 non-negative integers")
     if t_grid.ndim != 1 or t_grid.size < 1 or (np.diff(t_grid) <= 0).any():
         raise ValueError("t_grid must be strictly increasing")
     if seed_value is not None:
         seed(int(seed_value))
-    X, C, t, x, n, t_ext, x_max, stop = _ssa(
-        x0, p, STOICH, t_grid, bool(stop_on_extinction), int(stop_cum_infections), int(max_events)
+    X, C, t, x, counts, n, t_ext, x_max, stop = _ssa(
+        x0, p, STOICH, t_grid, bool(stop_on_extinction), int(stop_cum_infections), cap, int(max_events)
     )
-    return SSAResult(t_grid, X, C, float(t), x, int(n), t_ext, x_max, int(stop))
+    return SSAResult(t_grid, X, C, float(t), x, counts, int(n), t_ext, x_max, int(stop))

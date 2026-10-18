@@ -139,6 +139,23 @@ Each CSV row carries its seed. No notebook in the final repo except an optional
   N = 2000 per point, conditional on viral establishment. Figure with theory curve
   and SSA points. Second panel: the old notebook figure redrawn, with trajectories
   coloured by CTL lineage fate rather than by "extinct versus established".
+- Status 2026-10-18: done, with two changes found by the data. (1) q is a weak
+  lever (failure 7 to 3 percent across two decades of q) because the infected-cell
+  load crosses d_E/q within hours at R0 = 33; the figure sweeps the effector death
+  rate d_E instead (failure 0.6 to 91 percent over d_E in [0.03, 3]), and the q sweep
+  stays in the CSV for one sentence. (2) A variant with k = 0 isolates the lineage
+  process; given the infected-cell path it is exactly a linear birth-death process,
+  and Kendall's formula evaluated on each realisation's own path matches it. The
+  deterministic-forcing approximation runs about 3 percent (relative) low because
+  conditioned-on-survival loads grow faster than the ODE. With E0 = 1 and the preset,
+  P(failure | established) = 0.051 [0.041, 0.063], theory 0.045: this is the course
+  notebook's "4.9 percent established". Above d_E of about 1 per day the full model
+  exceeds the theory through a second route, the expanded response collapsing before
+  clearance; the CSV splits the two routes by the peak effector count (E_EXPANDED = 10).
+  Files: `viraldyn/theory.py` (kendall_extinction, immune_failure_probability),
+  `scripts/exp_immune_activation.py`, `scripts/fig5_immune_activation.py`,
+  `tests/test_immune_activation.py`. The SSA gained a per-species cap (`stop_above`)
+  because nothing limits the effectors when k = 0.
 
 ### WP4 Competitive release and resistance emergence. ~0.5 day setup, compute
 overnight, 1 day analysis.

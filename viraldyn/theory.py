@@ -17,8 +17,9 @@ P(establish from one virion) = pi (1 - 1/R0), with R0 = pi p / d.
 from typing import NamedTuple
 
 import numpy as np
+from scipy.integrate import cumulative_trapezoid
 
-from .model import E, IM, IW, VM, VW, Params
+from .model import E, IM, IW, VM, VW, Params, solve_ode
 
 
 class ExtinctionProbabilities(NamedTuple):
@@ -79,3 +80,37 @@ def single_virion_closed_form(p: Params, T, E_fixed=0.0) -> float:
     pi = infection_probability((1.0 - p.eps_b) * p.bw, p.cw, T)
     r0 = pi * (1.0 - p.eps_p) * p.pw / d
     return max(0.0, pi * (1.0 - 1.0 / r0)) if r0 > 0 else 0.0
+
+
+# --- the effector lineage: a linear birth-death process driven by the infected-cell load ---
+
+
+def kendall_extinction(t, birth, death):
+    """Probability that a linear birth-death lineage founded by one individual at
+    t[0] is extinct by each time in `t`, for a per-capita birth rate given on the
+    grid by `birth` and a constant per-capita death rate `death` (Kendall 1948):
+    rho(t) = death t - int_0^t birth, W(t) = 1 + int_0^t death e^{rho}, p0 = 1 - 1/W.
+    """
+    t = np.asarray(t, dtype=float)
+    rho = death * (t - t[0]) - cumulative_trapezoid(np.asarray(birth, dtype=float), t, initial=0.0)
+    W = 1.0 + cumulative_trapezoid(death * np.exp(rho), t, initial=0.0)
+    return 1.0 - 1.0 / W
+
+
+def ctl_extinction_curve(p: Params, x0, t):
+    """Extinction probability by time t of the lineage of one effector cell.
+
+    Its birth rate q I(t) follows the deterministic infected-cell load in the
+    absence of immune killing (k = 0, E = 0): while the lineage is small it does not
+    affect the infection, and by the time it is large its fate is decided.
+    """
+    x_free = np.asarray(x0, dtype=float).copy()
+    x_free[E] = 0.0
+    sol = solve_ode(p.replace(k=0.0), x_free, t)
+    return kendall_extinction(t, p.q * (sol[:, IW] + sol[:, IM]), p.dE)
+
+
+def immune_failure_probability(p: Params, x0, t_max=60.0, n=60001) -> float:
+    """P(all x0[E] founding effector lineages die out) = p0(t_max)^E0."""
+    t = np.linspace(0.0, t_max, n)
+    return float(ctl_extinction_curve(p, x0, t)[-1] ** float(x0[E]))
