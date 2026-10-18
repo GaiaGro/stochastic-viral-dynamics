@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "stochastic-viral-dynamics: exact stochastic simulation of a two-strain within-host viral model"
+authors:
+  - family-names: Grossi
+    given-names: Gaia
+    orcid: "https://orcid.org/0009-0004-3192-1678"
+    affiliation: Bocconi University
+  - family-names: Vanni
+    given-names: Leonardo
+    orcid: "https://orcid.org/0009-0003-1869-9286"
+    affiliation: Bocconi University
+license: MIT
+repository-code: "https://github.com/VanniLeonardo/stochastic-viral-dynamics"
+keywords:
+  - within-host viral dynamics
+  - Gillespie algorithm
+  - stochastic simulation
+  - drug resistance
+  - branching process
+  - mathematical biology
