@@ -1,24 +1,32 @@
 \section{Results}
 \label{sec:results}
 
+Every number in this section is read from the committed results of the experiments described in Section~\ref{sec:design}; intervals are 95\,\% Wilson intervals over the stated number of realisations.
+
 \subsection{Two deterministic regimes, and where the exact simulation agrees with them}
 \label{sec:regimes}
 
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig2_deterministic.pdf}
-  \caption{Deterministic regimes. (a) Chronic infection in the resistance preset. (b) Acute infection cleared by the effector response. \note{final caption}}
+  \caption{The two deterministic regimes, both started from the uninfected equilibrium. (a) Chronic infection in the resistance preset ($R_0 = \RzeroWt$, activation threshold $I^* = d_E/q = 50$ cells): a primary peak, damped oscillations, and a set point with \ResSetIw{} infected cells, \ResSetVw{} wild-type virions and \ResSetE{} effectors. (b) Acute infection in the acute preset ($R_0 = \RzeroAcute$, $I^* = 2$ cells): the effector response clears the infection within days and then decays.}
   \label{fig:deterministic}
 \end{figure*}
 
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig3_validation.pdf}
-  \caption{The exact simulation against the deterministic solution. (a) Median and 5th to 95th percentile band per species at system size 100 (\BaselineN{} realisations). (b) Phase plane of one realisation at system sizes 1 and 100 with the deterministic orbit. (c) Coefficient of variation in the stationary window against system size, with the linear-noise prediction. \note{final caption}}
+  \caption{When the deterministic description holds. (a) The resistance preset with every population scaled by $\Omega = 100$: median and 5th to 95th percentile band of \BaselineN{} exact realisations (solid, shaded) against the deterministic solution (dotted). The mutant, carried by the ODE as a fraction of a cell, is the only species where the two part. (b) One realisation at $\Omega = 1$ and one at $\Omega = 100$ in the plane of wild-type virions and effectors, from day 20, with the deterministic orbit and fixed point. (c) Coefficient of variation of each population over days 200 to 300 against $\Omega$ (points, \FlucN{} realisations per size) and the linear-noise prediction (lines).}
   \label{fig:validation}
 \end{figure*}
 
-\note{Figures~\ref{fig:deterministic} and \ref{fig:validation}: median within $\BaselineMaxLogDev$ in $\log_{10}$ for the four large populations; the mutant is where the descriptions part.}
+Figure~\ref{fig:deterministic} shows the two behaviours the deterministic model produces when started from its uninfected equilibrium. In the resistance preset ($R_0 = \RzeroWt$, activation threshold $I^* = d_E/q = 50$ infected cells) the infection grows to a primary peak, the effector response expands, and the system settles through damped oscillations into a chronic state with \ResSetIw{} infected cells, \ResSetVw{} wild-type virions and \ResSetE{} effector cells. In the acute preset ($R_0 = \RzeroAcute$, $I^* = 2$ cells) the same response clears the infection within days and then decays. Which regime a parameter set falls into is decided by the activation threshold, which is also the chronic set point of infected cells (Section~\ref{sec:thresholds}).
+
+\paragraph{Agreement at large populations}
+Figure~\ref{fig:validation}a compares \BaselineN{} exact realisations of the chronic infection, with every population scaled by $\Omega = 100$ (equilibrium $T^* = 10^5$ target cells, set point 5000 infected cells), with the deterministic solution over 60 days. For target cells, infected cells, wild-type virions and effectors the median realisation stays within \BaselineMaxLogDev{} in $\log_{10}$ of the deterministic solution at every time, the solution lies inside the 5th to 95th percentile band throughout, and no realisation goes extinct. The mutant is the one species where the two descriptions part: the deterministic model carries between \BaselineMutMin{} and \BaselineMutMax{} mutant-infected cells as a continuous quantity, whereas the realisations hold an integer that is often zero, and their median falls \BaselineMutLogDev{} in $\log_{10}$ below the deterministic curve. Fractions of a cell are the first place where the deterministic model stops describing the stochastic process, and the rest of this section is about what happens there.
+
+\paragraph{Fluctuations shrink as $\Omega^{-1/2}$}
+Figure~\ref{fig:validation}b shows one realisation at $\Omega = 1$ and one at $\Omega = 100$ around the chronic fixed point. At $\Omega = 1$ the trajectory wanders in a cloud around the fixed point; at $\Omega = 100$ it follows the deterministic orbit. Figure~\ref{fig:validation}c quantifies this: over the stationary window the coefficient of variation at $\Omega = 1$ is \CvIwOne{} for infected cells, \CvVwOne{} for wild-type virions, \CvEOne{} for effectors and \CvTOne{} for target cells, and it falls with fitted slopes between \CvSlopeMin{} and \CvSlopeMax{} in $\Omega$. The linear-noise approximation around the deterministic fixed point (Appendix~\ref{app:derivations}) predicts every value within \CvMaxRelDev\,\%. At the resistance preset's size the number of infected cells therefore fluctuates by about a third around a set point of 50, which is the scale at which the next three sections operate.
 
 \subsection{Establishment from a small inoculum}
 \label{sec:establishment}
@@ -26,11 +34,17 @@
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig4_establishment.pdf}
-  \caption{Probability of establishment. (a) Against inoculum for four fixed effector counts. (b) Against $R_0$ for inocula of 1 and 5 virions, with the deterministic step. Points: simulation with 95\,\% Wilson intervals; lines: branching theory. \note{final caption}}
+  \caption{Probability that an infection establishes, defined as 100 cumulative infection events before extinction, from \EstN{} realisations per point (points with 95\,\% intervals) against the branching-process prediction (lines). (a) Against the inoculum of wild-type virions, for four fixed effector counts. (b) Against $R_0$ for inocula of 1 and 5 virions, with the deterministic prediction, a step from 0 to 1 at $R_0 = 1$.}
   \label{fig:establishment}
 \end{figure*}
 
-\note{Theory inside the interval in \EstInsideInterval{} of \EstConditions{} conditions; one virion at $R_0 = \RzeroEstablishment$ establishes with probability \EstOneVirionTheory{} (observed \EstOneVirionObserved).}
+We start an infection with $V_0$ wild-type virions in the establishment preset with the effector population frozen at $E_0$ cells ($q = d_E = 0$), so that the branching-process description of Section~\ref{sec:theory} is exact rather than approximate, and record whether 100 cumulative infection events occur before the last infected cell and virion are gone. The threshold is immaterial: for one virion at five infectivities covering $R_0$ from \EstThresholdRzeroMin{} to \EstThresholdRzeroMax, the probability of reaching 25, 50, 100, 200 or 400 events is identical to four decimal places (largest spread \EstThresholdSpread).
+
+\paragraph{One virion establishes four times in five}
+At $R_0 = \RzeroEstablishment$ without effectors a single virion establishes with probability \EstOneVirionObserved{} (\EstOneVirionLow{} to \EstOneVirionHigh); the closed form $\pi(1 - 1/R_0)$, with $\pi$ the probability that a virion infects before it is cleared, gives \EstOneVirionTheory{} (Figure~\ref{fig:establishment}a). Fifty frozen effectors, which add $kE_0$ to the death rate of infected cells, bring it to \EstFiftyObserved{} (theory \EstFiftyTheory). Over all \EstConditions{} conditions the prediction lies inside the 95\,\% interval in \EstInsideInterval, the pooled deviation is $z = \EstPooledZ$, and the largest absolute difference is \EstMaxDev.
+
+\paragraph{The threshold at $R_0 = 1$ is not where establishment happens}
+Figure~\ref{fig:establishment}b sweeps the infectivity. The deterministic model predicts establishment for every $R_0 > 1$. In the stochastic model, at $R_0 = \EstRzeroNearThree$ a single virion establishes in \EstOneAtThree\,\% of realisations and five virions in \EstFiveAtThree\,\%; a single virion reaches even odds only at $R_0 \approx \EstOneHalfRzero$, five virions at $R_0 \approx \EstFiveHalfRzero$. The curves follow the branching prediction at every point.
 
 \subsection{Stochastic failure of immune activation}
 \label{sec:immune}
@@ -38,11 +52,20 @@
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig5_immune_activation.pdf}
-  \caption{Failure of immune activation. (a) Against initial effector count for three death rates. (b) Against effector death rate: full model, founding-lineage route only, no-killing variant, and Kendall's formula. (c) One hundred realisations from one virion and one effector cell, coloured by fate. \note{final caption}}
+  \caption{Stochastic failure of immune activation in the establishment preset, from one wild-type virion and $E_0$ effector cells (\ImmN{} realisations per condition; probabilities are conditional on the infection establishing). (a) Against $E_0$ for three effector death rates; lines are Kendall's formula with the deterministic infected-cell load as forcing. (b) Against the effector death rate for $E_0 = 1$: full model (filled), the founding-lineage route only (bars), the variant without killing (open), and the formula. (c) One hundred realisations with $E_0 = 1$ coloured by fate: early extinction of the virus (\TrajBottleneck), clearance by the effectors (\TrajCleared), and the effector lineage dying while the virus persists (\TrajFailure), with the deterministic solution in black.}
   \label{fig:immune}
 \end{figure*}
 
-\note{Headline: with one effector cell, activation fails in \ImmFailObserved\,\% of established infections (\ImmFailLow{} to \ImmFailHigh), theory \ImmFailTheory\,\%; \ImmFailUnconditional\,\% unconditionally. Across death rates \ImmFailDeMin{} to \ImmFailDeMax\,\%. The second route above 1 per day.}
+In the establishment preset with its effector response active, the deterministic model clears an infection started from one virion within two days: the infected-cell load exceeds the activation threshold $I^* = 1$ at once, the effectors expand and remove the infected cells. With a single effector cell the stochastic model does not always do this. The cell divides at rate $q I(t)$ and dies at rate $d_E$; if it dies before the load has grown, the response never starts and the infection settles at the set point it would have without immunity.
+
+\paragraph{One founding cell fails one time in twenty}
+With $E_0 = 1$, activation fails in \ImmFailObserved\,\% of established infections (\ImmFailLow{} to \ImmFailHigh\,\%; \ImmFailN{} of \ImmEstN), or \ImmFailUnconditional\,\% of all realisations. Kendall's formula for a birth--death lineage whose birth rate follows the deterministic infected-cell load predicts \ImmFailTheory\,\% (Figure~\ref{fig:immune}a). The failures are not transients: the effector cell dies at a median of \ImmFailDeathDay{} days, and the infection then sits at the no-immune set point of \ImmNoImmuneSetPoint{} infected cells and virions at day 60 and still at day 200, with none of the \ImmFailEarlyN{} failed realisations clearing by then (at the sweep's death rate of \ImmCollapseDe{} per day). Figure~\ref{fig:immune}c shows the three fates side by side: in \TrajBottleneck{} of 100 realisations the virus dies early, in \TrajCleared{} the effectors clear it as the deterministic model says, and in \TrajFailure{} the single effector cell dies and the virus persists. Two founding cells fail together in \ImmFailTwo\,\% of established infections (theory \ImmFailTwoTheory\,\%), three in none of \ImmEstThreeN.
+
+\paragraph{The lever is the effector death rate}
+The proliferation rate barely matters: across two decades of $q$ the failure probability moves from \ImmFailQLow{} to \ImmFailQHigh\,\%, because at $R_0 = \RzeroEstablishment$ the load crosses the activation threshold within hours whatever $q$ is. The death rate decides whether the founding cell survives that lag: from $d_E = \ImmDeMin$ to \ImmDeMax{} per day the failure probability runs from \ImmFailDeMin{} to \ImmFailDeMax\,\% (Figure~\ref{fig:immune}b). Up to about one per day every failure is of the founding-lineage kind and the formula tracks it. Above that a second route appears: the response expands to hundreds of cells, drives the infection down to a handful of cells, and then dies out before clearing it, after which the virus rebounds to the no-immune set point. At $d_E = \ImmDeMax$ per day this route accounts for \ImmCollapseDeMaxN{} of \ImmCollapseDeMaxEst{} established infections (\ImmCollapseDeMaxPct\,\%), while the founding-lineage route alone gives \ImmFailDeMaxEarly\,\% against the formula's \ImmFailDeMaxTheory\,\%. Below one per day the collapse route does not occur at all (\ImmCollapseBelowOne{} realisations), and at $d_E = \ImmDeMid$ it accounts for \ImmCollapseMidN{} of \ImmCollapseMidEst.
+
+\paragraph{The formula is exact given the load}
+In a variant where the effectors cannot kill ($k = 0$) the lineage does not act back on the infection, and Kendall's formula evaluated on each realisation's own infected-cell path falls inside the 95\,\% interval in all \ImmConditions{} conditions of the three sweeps (pooled $z = \ImmKzeroPathZ$). The same formula with the deterministic load as forcing is outside the interval in \ImmKzeroDetOutside{} of \ImmConditions{} (pooled $z = \ImmKzeroDetZ$), a few percent low, because loads conditioned on establishment grow faster than the deterministic one. Against the full model it is outside in \ImmFullDetOutside{} of \ImmConditions{} (pooled $z = \ImmFullDetZ$), with the excess coming from the collapse route at the highest death rates, which the lineage formula does not describe.
 
 \subsection{Competitive release and the emergence of resistance}
 \label{sec:resistance}
@@ -50,18 +73,34 @@
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig6_competitive_release.pdf}
-  \caption{Competitive release. (a) Deterministic. (b) Median and band of 1000 realisations. (c) Fraction of realisations with each strain present. \note{final caption}}
+  \caption{Competitive release in the resistance preset, treatment on day 30 with $\varepsilon_\beta = 0.9$. (a) Deterministic solution: the wild type collapses and the mutant rises to the vacated set point. (b) Median and 5th to 95th percentile band of \EnsembleN{} exact realisations, with the deterministic solution dotted. (c) Fraction of realisations in which each strain is present over time.}
   \label{fig:release}
 \end{figure*}
 
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig7_resistance.pdf}
-  \caption{Probability that resistance emerges. (a) Over treatment start and efficacy; the deterministic model predicts takeover in every outlined cell. (b) Observed against the branching prediction conditional on the wild type's survival time. (c) Against system size. \note{final caption}}
+  \caption{Probability that resistance emerges, defined as 100 mutant infection events during therapy, from \ResN{} realisations per cell. (a) Against treatment start and efficacy; the deterministic model predicts takeover in every outlined cell, that is in all of them; the dashed line is the exact suppression threshold $\varepsilon^* = \EpsStar$. (b) Observed against the branching prediction along the wild-type path, conditional on the wild type's observed survival time (markers), with a line to the unconditional value. (c) Against system size at treatment on day 30 with $\varepsilon_\beta = 0.9$.}
   \label{fig:resistance}
 \end{figure*}
 
-\note{Deterministic takeover in \OdeTakeoverCells{} of 25 cells; stochastic emergence \EmergeSuppressedMin{} to \EmergeSuppressedMax\,\% when the drug suppresses the wild type (cure at least \CureSuppressedMin\,\%), \EmergeWeakMin{} to \EmergeWeakMax\,\% at $\varepsilon_\beta = 0.5$; system size $\Omega = \OmegaMax$: \EmergeOmegaMax\,\% emergence, \CureOmegaMax\,\% cure. The notebook's therapy preset: trough \TherapyTrough{} virions at day \TherapyTroughDay, \TherapyAlive{} of 1000 alive.}
+\paragraph{A chronic infection the stochastic model can sustain}
+The deterministic two-strain model predicts competitive release: a drug that suppresses the wild type frees target cells, and a resistant mutant with a fitness cost takes them over. The parameter set in which this is usually shown is not one in which the stochastic model has a chronic infection at all. In the therapy preset the deterministic infection passes through \TherapyTrough{} virions at day \TherapyTroughDay{} and recovers, its set point is \TherapySetIw{} infected cells, and \TherapyAlive{} of \ViabilityN{} exact realisations survive to day 100. The resistance preset keeps the same reproduction numbers ($R_0 = \RzeroWt$ for the wild type and \RzeroMut{} for the mutant) and lowers the effector proliferation and killing rates so that the set point is \ResSetIw{} infected cells; its trough is \ResTrough{} virions and \ResistanceAlive{} of \ViabilityN{} realisations survive. All results below use it, started at the uninfected equilibrium with 10 infected cells and 10 effectors, treated from day $t_{\mathrm{treat}}$ with an infection-blocking drug of efficacy $\varepsilon_\beta$ for 120 days. The wild type's $R_0(\varepsilon_\beta)$ falls to one at $\varepsilon^* = \EpsStar$, not at $1 - 1/R_0$, because $\beta$ also sits in the virion-consumption term; the grid value $0.8$ therefore lies just below criticality ($R_0 = \RzeroWtKnife$).
+
+\paragraph{Deterministic release, stochastic cure}
+Figure~\ref{fig:release} shows treatment on day 30 with $\varepsilon_\beta = 0.9$. Deterministically the wild type collapses within days and the mutant, present as a fraction of a virion, grows to the set point the wild type vacated. In the \EnsembleN{} exact realisations the wild type collapses in every one, but a mutant lineage is present at the start of treatment in \EnsemblePreAtTreat\,\% of them and at the horizon in \EnsembleMutAtEnd\,\%, and the wild type is present at the horizon in \EnsembleWtAtEnd\,\%: the typical outcome is cure. Each mutant virion founds a surviving lineage with probability \MutVirionEstablish{} in the post-treatment environment, and the collapsing wild type produces about one mutant virion on its way out.
+
+\paragraph{The grid}
+Figure~\ref{fig:resistance}a varies the treatment start between day 5 and day 50 and the efficacy between 0.5 and 0.99. The deterministic model predicts mutant takeover in \OdeTakeoverCells{} of \ResCells{} cells. In the stochastic model, whenever the drug suppresses the wild type ($\varepsilon_\beta \ge 0.8$) resistance emerges in \EmergeSuppressedMin{} to \EmergeSuppressedMax\,\% of realisations and the infection is cured in \CureSuppressedMin{} to \CureSuppressedMax\,\%. At $\varepsilon_\beta = 0.5$, where the wild type keeps $R_0 = \RzeroWtWeak$ and persists, resistance emerges in \EmergeWeakMin{} to \EmergeWeakMax\,\%: the wild type keeps producing mutants, which are now the fitter strain, and when a lineage establishes it replaces the wild type over weeks (median \DominanceWeakMin{} to \DominanceWeakMax{} days after treatment start, over the realisations in which it happens), so the wild type is still present at the horizon in \WtHorizonWeakMin{} to \WtHorizonWeakMax\,\%. At $\varepsilon_\beta = 0.7$ emergence is \EmergeMidMin{} to \EmergeMidMax\,\%. A mutant lineage is present when treatment starts in \PreMin{} to \PreMax\,\% of realisations, most often just after the primary peak (\PreDayFive\,\% at day 5), but at $\varepsilon_\beta = 0.5$ its presence hardly changes the outcome (emergence \EmergeWeakPreMin{} to \EmergeWeakPreMax\,\% with a lineage present, \EmergeWeakDenovoMin{} to \EmergeWeakDenovoMax\,\% without): what is rare is not the arrival of a mutant but the establishment of its lineage.
+
+\paragraph{One prediction for every cell}
+Figure~\ref{fig:resistance}b compares each cell with the branching prediction along the wild-type-only deterministic path, in which a mutant-cell lineage is a birth--death process with birth rate $p_m \pi_m(T(t))$ and death rate $\delta + kE(t)$ and de novo mutants arrive from the wild-type load. Conditional on the observed survival time of the wild type in each realisation the prediction is \TheoryWeakCondMin{} to \TheoryWeakCondMax\,\% at $\varepsilon_\beta = 0.5$ against \EmergeWeakMin{} to \EmergeWeakMax\,\% observed, \TheoryMidCondMin{} to \TheoryMidCondMax\,\% at $0.7$ against \EmergeMidMin{} to \EmergeMidMax\,\%, and \TheorySuppressedCondMin{} to \TheorySuppressedCondMax\,\% at $\varepsilon_\beta \ge 0.8$ against \EmergeSuppressedMin{} to \EmergeSuppressedMax\,\%. The conditioning matters at $\varepsilon_\beta = 0.7$: unconditionally the formula predicts \TheoryMidMin{} to \TheoryMidMax\,\%, because the deterministic wild type recovers from the drug-induced trough and keeps supplying mutants, whereas the stochastic wild type survives the first 30 days of treatment in only \WtWindowMidMin{} to \WtWindowMidMax\,\% of realisations.
+
+\paragraph{System size}
+Figure~\ref{fig:resistance}c scales every population by $\Omega$ at treatment on day 30 with $\varepsilon_\beta = 0.9$. For $\Omega = \OmegaList$ resistance emerges in \EmergeOmegaList\,\% of realisations, the prediction gives \TheoryOmegaList\,\%, and the infection is cured in \CureOmegaList\,\%. The deterministic prediction of certain takeover is approached only above $\Omega = 100$, and at $\Omega = \OmegaMax$ one realisation in eight is still cured.
+
+\paragraph{Robustness}
+Counting 20, 50, 200 or 500 mutant infection events instead of 100 changes the emergence probability by at most \ThresholdSpreadWeak{} at $\varepsilon_\beta = 0.5$ and \ThresholdSpreadRest{} elsewhere; scaling the threshold with $\Omega$ changes the system-size results by at most \ScaledThresholdMaxDiff. Varying the killing rate across a decade ($k$ from \SensKMin{} to \SensKMax) at treatment on day 30 with $\varepsilon_\beta = 0.9$ leaves emergence between \SensKEmergeMin{} and \SensKEmergeMax\,\% and cure above \SensKCureMin\,\%; a set point of \SensIstarBig{} infected cells gives \SensIstarBigEmerge\,\%; a set point of \SensIstarDead{} cells is not a viable chronic infection, with \SensIstarDeadN{} of \SensIstarDeadN{} realisations dying before treatment. At $\varepsilon_\beta = 0.5$ the replacement is still in progress at day 120: by day \HorizonLong{} resistance has emerged in \EmergeLongMin{} to \EmergeLongMax\,\% of realisations and the wild type remains in \WtLongMin{} to \WtLongMax\,\%, with the unconditional and conditional predictions (\TheoryLongMin{} to \TheoryLongMax\,\% and \TheoryLongCondMin{} to \TheoryLongCondMax\,\%) bracketing the observation. One cell has \ResShortN{} rather than \ResN{} realisations because one pre-treatment infection died.
 
 \subsection{A stochastic regime map}
 \label{sec:map}
@@ -69,8 +108,17 @@
 \begin{figure*}[tbp]
   \centering
   \includegraphics[width=\textwidth]{fig8_regime_map.pdf}
-  \caption{Regime map over infectivity and killing rate. (a) Probability of establishment. (b) Probability of persistence at day 200. (c) Transect at the preset killing rate. \note{final caption}}
+  \caption{Regime map over wild-type infectivity and effector killing rate in the establishment preset with $q = 0.002$ ($I^* = 50$), from 5 virions and 10 effectors, \MapN{} realisations per cell. (a) Probability of establishment; the orange contour is the branching prediction with decaying effectors at $P = 0.5$. (b) Probability that infected cells or virions are present at day 200; the orange contour bounds the region where the deterministic model persists. Dashed: $R_{\mathrm{eff}} = 1$ with the initial effectors; dotted: $R_0 = 1$ without them. (c) Transect at $k = \MapTransectK$.}
   \label{fig:map}
 \end{figure*}
 
-\note{Of \MapChronicCells{} deterministically chronic cells, \MapNeverPersist{} never persist, \MapIntermediate{} persist with intermediate probability, \MapAlwaysPersist{} in more than 95\,\% of runs; with the preset's $q$ the deterministic model calls \MapNotebookChronicCells{} cells chronic and nothing persists.}
+The deterministic model classifies the plane of infectivity and killing rate into extinction, clearance and chronic infection by thresholds. Figure~\ref{fig:map} replaces the classification with two probabilities on a $25 \times 25$ grid, from \MapN{} exact realisations per cell, in the establishment preset with the proliferation rate lowered to $q = 0.002$ so that the chronic set point is 50 infected cells.
+
+\paragraph{Establishment is a band, not a line}
+The deterministic threshold is $R_0 = 1$ in the infectivity alone (dotted). With ten effectors present from the start the relevant threshold is $R_{\mathrm{eff}} = R_0\,\delta/(\delta + kE_0) = 1$ (dashed), which bends upward at high killing rates. The stochastic establishment probability rises from near zero to near one over about \MapTransitionDecades{} decade of infectivity around that line (at $k = \MapTransectK$, from $R_0 = \MapTransitionRzeroMin$ to \MapTransitionRzeroMax), and the branching prediction with effectors decaying from $E_0$ follows the simulated boundary, including its bend: it falls outside the 95\,\% interval in \MapTheoryOutside{} of \MapCells{} cells, against \MapTheoryFixedOutside{} for the fixed-effector formula, with the excess near criticality where 100 cumulative infections is not yet ultimate survival.
+
+\paragraph{Persistence has a boundary the deterministic model does not have}
+On the same grid the deterministic model never clears: it calls \MapChronicCells{} cells chronic, \MapClearedCells{} cleared and \MapExtinctionCells{} extinction. Of the \MapChronicCells{} chronic cells, the infection never persists to day 200 in \MapNeverPersist, persists with a probability between 0 and 0.95 in \MapIntermediate, and in more than 95\,\% of realisations in only \MapAlwaysPersist. The transect at $k = \MapTransectK$ (Figure~\ref{fig:map}c) puts the three thresholds on one line: the deterministic infection persists from $R_0 = \MapOdePersistFrom$, stochastic establishment reaches even odds at $R_0 \approx \MapEstHalfRzero$, and persistence at day 200 reaches even odds only at $R_0 \approx \MapPersistHalfRzero$, with a maximum of \MapPersistMax{} at the edge of the grid. Persistence is a statement about a horizon: following the \MapHorizonCells{} cells with intermediate probability to day 1000 lowers it by \MapHorizonMeanDrop{} on average and by \MapHorizonWorstDrop{} in the worst cell, and moves \MapHorizonFlips{} cells across the 50\,\% line.
+
+\paragraph{With the preset's own proliferation rate nothing persists}
+At the establishment preset's $q = 0.1$ the chronic set point is a single infected cell. The deterministic model then calls \MapNotebookChronicCells{} cells chronic and \MapNotebookClearedCells{} cleared; across the whole grid \MapNotebookPersisting{} of \MapNotebookRuns{} exact realisations persist to day 200 (Appendix~\ref{app:parameters}, Figure~\ref{fig:notebook_map}).
