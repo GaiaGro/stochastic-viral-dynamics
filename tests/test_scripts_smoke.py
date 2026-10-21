@@ -27,7 +27,7 @@ def test_regime_map_one():
     assert present_200 or not present_1000  # alive at day 1000 implies alive at day 200
     peak, end = exp_regime_map.deterministic(p)
     assert peak >= end > -1e-6
-    assert exp_regime_map.classify_ode(exp_regime_map.r_eff(p, exp_regime_map.X0[5]), end) in ("extinction", "cleared", "chronic")
+    assert exp_regime_map.classify_ode(peak, end) in ("extinction", "cleared", "chronic")
 
 
 def test_baseline_one():

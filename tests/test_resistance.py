@@ -1,7 +1,9 @@
+import csv
+
 import numpy as np
 import pytest
 
-from exp_resistance import BASE, dominance_time, one, theory
+from exp_resistance import BASE, dominance_time, one, summarise, theory, write
 from viraldyn import suppression_efficacy, r0_wild_type
 
 
@@ -49,3 +51,16 @@ def test_two_phase_run_is_reproducible():
     clean = lambda d: {k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in d.items()}
     assert clean(a) == clean(b)
     assert set(a) >= {"pre", "emerged", "mut_h", "wt_h", "dominant_h", "t_dom", "t_wt_ext", "p_theory", "p_theory_cond"}
+
+
+def test_non_viable_condition_is_written_with_nan_columns(tmp_path):
+    """A condition where every realisation dies before treatment gives a short row; the
+    writer must still produce the full header and fill the missing values with nan."""
+    rec, _ = one(42, 30, 0.9)
+    full = summarise(30, 0.9, [rec], 0, 42)
+    short = summarise(30, 0.9, [], 1000, 0)
+    assert short["n"] == 0 and set(short) < set(full)
+    write(tmp_path / "r.csv", [short, full])  # the short row first: the header must come from the fullest row
+    rows = list(csv.DictReader(open(tmp_path / "r.csv")))
+    assert list(rows[0]) == list(full) and rows[0]["n"] == "0" and rows[0]["p_emerge"] == "nan"
+    assert rows[1]["n"] == "1" and rows[1]["p_emerge"] == str(full["p_emerge"])

@@ -1,8 +1,8 @@
 """Stochastic regime map over wild-type infectivity and effector killing rate.
 
-The deterministic model classifies each cell as extinction (R_eff < 1 with the
-initial effectors, so the load declines from the start), cleared (it grows and
-falls below one by the horizon) or chronic (above one at the horizon). Here each cell of a 25 x 25 log grid gets N exact
+The deterministic model classifies each cell as extinction (the load never rises
+above the inoculum), cleared (it grows and falls below one by the horizon) or
+chronic (above one at the horizon). Here each cell of a 25 x 25 log grid gets N exact
 realisations from 5 wild-type virions and 10 effectors in the "establishment"
 preset (T* = 1000) and two probabilities are recorded:
 
@@ -89,11 +89,11 @@ def deterministic(p):
     return float(load.max()), float(load[-1])
 
 
-def classify_ode(r_eff_E0, end):
-    """Deterministic class: no growth from the start, grown then cleared, or persisting."""
-    if r_eff_E0 < 1.0 and end < 1.0:
-        return "extinction"
-    return "chronic" if end >= 1.0 else "cleared"
+def classify_ode(peak, end, load0=sum(X0[1:5])):
+    """Deterministic class: load never above the inoculum, grown then cleared, or persisting."""
+    if end >= 1.0:
+        return "chronic"
+    return "cleared" if peak > load0 * (1 + 1e-6) else "extinction"  # 1e-6: floating-point rounding on a declining load, not growth
 
 
 def run_map(q, seed):
@@ -115,7 +115,7 @@ def run_map(q, seed):
                 "p_persist": per / N, "p_persist_low": float(lo_p), "p_persist_high": float(hi_p),
                 "p_est_theory": establishment_probability_decaying_effectors(p, X0),
                 "p_est_theory_fixedE": establishment_probability(p, X0),
-                "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(r_eff(p, X0[5]), end),
+                "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(peak, end),
                 "seed_start": seed,
             })
             seed += N
