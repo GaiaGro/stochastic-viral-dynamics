@@ -1,7 +1,7 @@
 {
   "title": "stochastic-viral-dynamics: exact stochastic simulation of a two-strain within-host viral model",
   "upload_type": "software",
-  "description": "Code, results and manuscript sources for a reproducible study of a two-strain within-host viral model with a CTL response, comparing exact stochastic simulation (Gillespie direct method, numba-compiled) with the deterministic ODE limit and with branching-process predictions: establishment from small inocula, stochastic failure of immune activation, and the emergence of drug resistance under therapy.",
+  "description": "Code and results for a reproducible study of a two-strain within-host viral model with a CTL response, comparing exact stochastic simulation (Gillespie direct method, numba-compiled) with the deterministic ODE limit and with branching-process predictions: establishment from small inocula, stochastic failure of immune activation, and the emergence of drug resistance under therapy.",
   "creators": [
     {"name": "Grossi, Gaia", "affiliation": "Bocconi University", "orcid": "0009-0004-3192-1678"},
     {"name": "Vanni, Leonardo", "affiliation": "Bocconi University", "orcid": "0009-0003-1869-9286"}
