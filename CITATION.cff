@@ -11,6 +11,8 @@ authors:
     given-names: Leonardo
     orcid: "https://orcid.org/0009-0003-1869-9286"
     affiliation: Bocconi University
+version: 1.0.0
+date-released: "2026-10-21"
 license: MIT
 repository-code: "https://github.com/VanniLeonardo/stochastic-viral-dynamics"
 keywords:

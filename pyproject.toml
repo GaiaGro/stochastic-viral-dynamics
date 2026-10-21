@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "viraldyn"
-version = "0.1.0"
+version = "1.0.0"
 description = "Exact stochastic simulation of a two-strain within-host viral model"
 readme = "README.md"
 license = { text = "MIT" }
