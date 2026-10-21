@@ -25,8 +25,7 @@ SEQ_RAMP = ("#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#
 TEXT = "#0b0b0b"
 MUTED = "#52514e"
 GRID = "#dedcd7"
-SINGLE = 3.4  # column width in inches
-DOUBLE = 7.0
+DOUBLE = 7.0  # figure width in inches
 
 FIGURES = Path(__file__).resolve().parents[1] / "figures"
 

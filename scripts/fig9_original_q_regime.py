@@ -18,7 +18,7 @@ from viraldyn.plotting import COLOR, DOUBLE, MUTED, SEQ_RAMP, panel_label, save,
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ("extinction", "cleared", "chronic")
 CLASS_COLOR = {"extinction": "#b0aea8", "cleared": COLOR["ctl"], "chronic": COLOR["wt"]}
-CLASS_LABEL = {"extinction": "extinction ($R_0 < 1$)", "cleared": "cleared (load below 1 at day 200)", "chronic": "chronic (load above 1 at day 200)"}
+CLASS_LABEL = {"extinction": "extinction ($R_\\mathrm{eff} < 1$ with the initial effectors)", "cleared": "cleared (load below 1 at day 200)", "chronic": "chronic (load above 1 at day 200)"}
 
 
 def main():

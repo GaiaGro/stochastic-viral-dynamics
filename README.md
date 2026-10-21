@@ -10,7 +10,7 @@ against its deterministic limit and branching-process theory.
   <a href="https://doi.org/10.5281/zenodo.XXXXXXX"><img src="https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.XXXXXXX-blue.svg" alt="Zenodo"></a>
   <a href="https://github.com/VanniLeonardo/stochastic-viral-dynamics/actions/workflows/ci.yml"><img src="https://github.com/VanniLeonardo/stochastic-viral-dynamics/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT license"></a>
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/python-3.12%2B-blue.svg" alt="Python 3.12+">
 </p>
 
 <p align="center">

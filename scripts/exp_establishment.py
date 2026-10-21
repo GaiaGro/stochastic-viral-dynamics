@@ -44,8 +44,7 @@ OUT_THRESHOLD = ROOT / "results" / "establishment_threshold.csv"
 
 
 def one(seed, p, x0):
-    r = simulate(p, x0, [0.0, T_MAX], seed_value=seed, stop_on_extinction=True, stop_cum_infections=THRESHOLD)
-    return r.stop_reason, r.t_end
+    return simulate(p, x0, [0.0, T_MAX], seed_value=seed, stop_on_extinction=True, stop_cum_infections=THRESHOLD).stop_reason
 
 
 def one_cumulative(seed, p, x0):
@@ -54,9 +53,7 @@ def one_cumulative(seed, p, x0):
 
 
 def condition(sweep, p, x0, seed_start):
-    outcomes = run_seeds(partial(one, p=p, x0=x0), range(seed_start, seed_start + N))
-    reasons = np.array([o[0] for o in outcomes])
-    times = np.array([o[1] for o in outcomes])
+    reasons = np.array(run_seeds(partial(one, p=p, x0=x0), range(seed_start, seed_start + N)))
     k = int((reasons == STOP_CUM_INFECTIONS).sum())
     undetermined = int(((reasons != STOP_CUM_INFECTIONS) & (reasons != STOP_EXTINCT)).sum())
     lo, hi = wilson(k, N)
@@ -73,8 +70,6 @@ def condition(sweep, p, x0, seed_start):
         "wilson_low": float(lo),
         "wilson_high": float(hi),
         "p_theory": establishment_probability(p, x0),
-        "mean_t_establish": float(times[reasons == STOP_CUM_INFECTIONS].mean()) if k else float("nan"),
-        "mean_t_extinct": float(times[reasons == STOP_EXTINCT].mean()) if k < N else float("nan"),
         "seed_start": seed_start,
     }
 

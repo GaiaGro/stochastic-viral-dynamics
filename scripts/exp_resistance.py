@@ -176,11 +176,10 @@ def run_cell(t_treat, eps, seed, p=BASE, x0=X0, horizon=H, keep=False):
 def summarise(t_treat, eps, recs, n_extinct_before, seed_start, p=BASE, x0=X0, omega=1, horizon=H):
     n = len(recs)
     if n == 0:
-        # the pre-treatment infection is not viable for these parameters: that is the result
-        row = {k: float("nan") for k in _COLUMNS}
-        row.update({"t_treat": t_treat, "eps": eps, "omega": omega, "horizon": horizon, "k": p.k, "q": p.q,
-                    "n": 0, "n_extinct_before_treatment": n_extinct_before, "seed_start": seed_start})
-        return row
+        # not a viable pre-treatment infection for these parameters: that is the result;
+        # the writer fills the other columns with nan
+        return {"t_treat": t_treat, "eps": eps, "omega": omega, "horizon": horizon, "k": p.k, "q": p.q,
+                "n": 0, "n_extinct_before_treatment": n_extinct_before, "seed_start": seed_start}
     k = sum(r["emerged"] for r in recs)
     lo, hi = wilson(k, n)
     pre = [r for r in recs if r["pre"]]
@@ -215,17 +214,6 @@ def summarise(t_treat, eps, recs, n_extinct_before, seed_start, p=BASE, x0=X0, o
     }
 
 
-_COLUMNS = (
-    ["t_treat", "eps", "omega", "horizon", "k", "q", "n", "n_extinct_before_treatment", "n_pre_existing", "n_emerged",
-     "n_emerged_pre", "n_emerged_denovo", "n_mutant_at_horizon", "n_wt_at_horizon", "n_cure", "n_dominant_at_horizon",
-     "n_wt_survived_window", "p_emerge", "wilson_low", "wilson_high"]
-    + [f"p_emerge_threshold_{th}" for th in THRESHOLDS_CHECKED]
-    + ["p_emerge_threshold_scaled", "p_emerge_pre", "p_emerge_denovo", "p_theory", "p_theory_cond", "p_theory_pre",
-       "p_theory_denovo", "p_theory_denovo_cond", "n_dominance", "median_t_dominance", "median_Vm0", "median_E0",
-       "median_T0", "ode_Vm_horizon", "ode_Vw_horizon", "ode_takeover", "seed_start"]
-)
-
-
 def _survives(seed, p):
     return simulate(p, X0, [0.0, 100.0], seed_value=seed, stop_on_extinction=True).stop_reason != STOP_EXTINCT
 
@@ -256,9 +244,10 @@ def viability(seed_start, n=1000):
 
 
 def write(path, data):
-    """Each stage writes its file as soon as it is done, so a failure later loses nothing."""
+    """Each stage writes its file as soon as it is done, so a failure later loses nothing.
+    Columns come from the fullest row; shorter rows (non-viable conditions) get nan."""
     with open(path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(data[0]))
+        w = csv.DictWriter(f, fieldnames=list(max(data, key=len)), restval="nan")
         w.writeheader()
         w.writerows(data)
 

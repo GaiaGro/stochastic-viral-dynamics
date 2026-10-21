@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from exp_establishment import BASE, E0_LEVELS, T0, V0_FOR_BETA
-from viraldyn import r0_wild_type
 from viraldyn.plotting import BLUE_RAMP, COLOR, DOUBLE, MUTED, panel_label, save, setup
 from viraldyn.theory import establishment_probability
 

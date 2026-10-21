@@ -1,8 +1,8 @@
 """Stochastic regime map over wild-type infectivity and effector killing rate.
 
-A deterministic classification of the (beta_w, k) plane uses thresholds alone:
-extinction if R0 < 1, clearance if the viral load falls below one by the horizon,
-chronic otherwise. Here each cell of a 25 x 25 log grid gets N exact
+The deterministic model classifies each cell as extinction (R_eff < 1 with the
+initial effectors, so the load declines from the start), cleared (it grows and
+falls below one by the horizon) or chronic (above one at the horizon). Here each cell of a 25 x 25 log grid gets N exact
 realisations from 5 wild-type virions and 10 effectors in the "establishment"
 preset (T* = 1000) and two probabilities are recorded:
 
@@ -30,9 +30,9 @@ from pathlib import Path
 
 import numpy as np
 
-from viraldyn import PRESETS, simulate, solve_ode
+from viraldyn import PRESETS, r0_wild_type, simulate, solve_ode
 from viraldyn.ensembles import provenance, run_seeds, write_meta
-from viraldyn.model import E, target_cell_equilibrium
+from viraldyn.model import target_cell_equilibrium
 from viraldyn.ssa import STOP_EXTINCT
 from viraldyn.stats import wilson
 from viraldyn.theory import establishment_probability, establishment_probability_decaying_effectors, infection_probability
@@ -60,8 +60,7 @@ def params(beta, k, q=Q_MAIN):
 
 def r_eff(p, E0):
     """Reproduction number of the wild type with E0 effectors present from the start."""
-    pi = infection_probability(p.bw, p.cw, target_cell_equilibrium(p))
-    return pi * p.pw * (1.0 - p.mu) / (p.delta + p.k * E0)
+    return r0_wild_type(p) * p.delta / (p.delta + p.k * E0)
 
 
 def k_threshold(beta, E0, p=BASE):
@@ -73,9 +72,7 @@ def k_threshold(beta, E0, p=BASE):
 
 def one(seed, p):
     r = simulate(p, X0, [0.0, T_END], seed_value=seed, stop_on_extinction=True, stop_above=[0, 0, 0, 0, 0, E_CAP])
-    established = r.cumulative_infections >= THRESHOLD
-    persist = r.stop_reason != STOP_EXTINCT
-    return established, persist, int(r.x_end[E]) == 0
+    return r.cumulative_infections >= THRESHOLD, r.stop_reason != STOP_EXTINCT
 
 
 def one_long(seed, p):
@@ -92,10 +89,11 @@ def deterministic(p):
     return float(load.max()), float(load[-1])
 
 
-def classify_ode(peak, end, v0=X0[3]):
-    if end >= 1.0:
-        return "chronic"
-    return "cleared" if peak >= 10.0 * v0 else "extinction"
+def classify_ode(r_eff_E0, end):
+    """Deterministic class: no growth from the start, grown then cleared, or persisting."""
+    if r_eff_E0 < 1.0 and end < 1.0:
+        return "extinction"
+    return "chronic" if end >= 1.0 else "cleared"
 
 
 def run_map(q, seed):
@@ -112,12 +110,12 @@ def run_map(q, seed):
             rows.append({
                 "bw": float(beta), "k": float(k), "q": float(q),
                 "R0_wt": r_eff(p, 0.0), "R_eff": r_eff(p, X0[5]),
-                "n": N, "n_established": est, "n_persist": per, "n_effectors_extinct": sum(o[2] for o in out),
+                "n": N, "n_established": est, "n_persist": per,
                 "p_est": est / N, "p_est_low": float(lo_e), "p_est_high": float(hi_e),
                 "p_persist": per / N, "p_persist_low": float(lo_p), "p_persist_high": float(hi_p),
                 "p_est_theory": establishment_probability_decaying_effectors(p, X0),
                 "p_est_theory_fixedE": establishment_probability(p, X0),
-                "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(peak, end),
+                "ode_peak_load": peak, "ode_load_end": end, "ode_class": classify_ode(r_eff(p, X0[5]), end),
                 "seed_start": seed,
             })
             seed += N

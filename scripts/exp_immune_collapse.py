@@ -44,6 +44,10 @@ def fate_at_60(o):
     return classify(stop, t_end, t_ctl if t_ctl <= T_CLASSIFY else np.nan, cum)
 
 
+def nanmedian(a):
+    return float(np.nanmedian(a)) if np.isfinite(a).any() else float("nan")  # no warning on all-NaN
+
+
 def summarise(group):
     if not group:
         return {"n": 0}
@@ -59,10 +63,10 @@ def summarise(group):
         "n": len(group),
         "median_t_effector_death": float(np.median(t_death)),
         "median_peak_E": float(np.median(peak)),
-        "median_min_load_before_death": float(np.nanmedian(min_load)),
-        "median_load_day60": float(np.nanmedian(load60)),
+        "median_min_load_before_death": nanmedian(min_load),
+        "median_load_day60": nanmedian(load60),
         "n_extinct_by_day200": int(sum(o[0] == STOP_EXTINCT for o in group)),
-        "median_load_day200_survivors": float(np.nanmedian(load200)) if np.isfinite(load200).any() else float("nan"),
+        "median_load_day200_survivors": nanmedian(load200),
     }
 
 

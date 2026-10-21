@@ -20,7 +20,7 @@ def run_seeds(fn, seeds, processes=None):
     processes = processes or os.cpu_count()
     if processes == 1 or len(seeds) < 2 * processes:
         return [fn(s) for s in seeds]
-    with mp.get_context("fork").Pool(processes) as pool:
+    with mp.get_context("fork" if hasattr(os, "fork") else "spawn").Pool(processes) as pool:
         return pool.map(fn, seeds, chunksize=max(1, len(seeds) // (8 * processes)))
 
 

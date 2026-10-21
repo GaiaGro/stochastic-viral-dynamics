@@ -15,21 +15,18 @@ from .model import N_REACTIONS, N_SPECIES, STOICH, Params, propensities
 STOP_T_END = 0
 STOP_EXTINCT = 1
 STOP_CUM_INFECTIONS = 2
-STOP_MAX_EVENTS = 3
-STOP_NO_REACTIONS = 4
-STOP_ABOVE = 5
-STOP_REASONS = ("t_end", "extinct", "cum_infections", "max_events", "no_reactions", "above")
+STOP_NO_REACTIONS = 3
+STOP_ABOVE = 4
+STOP_REASONS = ("t_end", "extinct", "cum_infections", "no_reactions", "above")
 
 # lineages tracked for extinction times
 WT, MUT, CTL = range(3)
-LINEAGES = ("wt", "mut", "ctl")
 
 
 @dataclass
 class SSAResult:
     t_grid: np.ndarray  # (n,)
     X: np.ndarray  # (n, 6) state at each grid time; -1 after an early stop
-    C: np.ndarray  # (n, 15) cumulative reaction counts at each grid time; -1 after stop
     t_end: float  # time at which the run stopped
     x_end: np.ndarray  # (6,) state at t_end
     c_end: np.ndarray  # (15,) cumulative reaction counts at t_end
@@ -66,11 +63,10 @@ def _lineage_sizes(x, out):
 
 
 @njit(cache=True)
-def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, max_events):
+def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above):
     n_grid = t_grid.shape[0]
     x = x0.copy()
     X = np.full((n_grid, N_SPECIES), -1, np.int64)
-    C = np.full((n_grid, N_REACTIONS), -1, np.int64)
     counts = np.zeros(N_REACTIONS, np.int64)
     a = np.empty(N_REACTIONS)
     x_max = x.copy()
@@ -88,8 +84,7 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, 
             stop = STOP_ABOVE
     if stop == STOP_ABOVE:
         X[0, :] = x
-        C[0, :] = counts
-        return X, C, t, x, counts, n_events, t_ext, x_max, stop
+        return X, t, x, counts, n_events, t_ext, x_max, stop
     while True:
         propensities(x, p, a)
         a0 = 0.0
@@ -99,7 +94,6 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, 
             # nothing can happen again: state is frozen for the rest of the grid
             while gi < n_grid:
                 X[gi, :] = x
-                C[gi, :] = counts
                 gi += 1
             t = t_grid[n_grid - 1]
             stop = STOP_NO_REACTIONS
@@ -107,7 +101,6 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, 
         t_new = t + np.random.exponential(1.0 / a0)
         while gi < n_grid and t_grid[gi] <= t_new:
             X[gi, :] = x  # state is constant on [t, t_new)
-            C[gi, :] = counts
             gi += 1
         if gi >= n_grid:
             t = t_grid[n_grid - 1]
@@ -144,10 +137,7 @@ def _ssa(x0, p, S, t_grid, stop_on_extinction, stop_cum_infections, stop_above, 
                 stop = STOP_ABOVE
         if stop == STOP_ABOVE:
             break
-        if n_events >= max_events:
-            stop = STOP_MAX_EVENTS
-            break
-    return X, C, t, x, counts, n_events, t_ext, x_max, stop
+    return X, t, x, counts, n_events, t_ext, x_max, stop
 
 
 def simulate(
@@ -158,7 +148,6 @@ def simulate(
     stop_on_extinction=False,
     stop_cum_infections=0,
     stop_above=None,
-    max_events=np.iinfo(np.int64).max,
 ) -> SSAResult:
     """One exact realisation from state `x0` recorded at the times in `t_grid`.
 
@@ -183,7 +172,5 @@ def simulate(
         if not 0 <= int(seed_value) < 2**32:
             raise ValueError("seed_value must fit in 32 bits; numba's generator wraps larger seeds silently")
         seed(int(seed_value))
-    X, C, t, x, counts, n, t_ext, x_max, stop = _ssa(
-        x0, p, STOICH, t_grid, bool(stop_on_extinction), int(stop_cum_infections), cap, int(max_events)
-    )
-    return SSAResult(t_grid, X, C, float(t), x, counts, int(n), t_ext, x_max, int(stop))
+    X, t, x, counts, n, t_ext, x_max, stop = _ssa(x0, p, STOICH, t_grid, bool(stop_on_extinction), int(stop_cum_infections), cap)
+    return SSAResult(t_grid, X, float(t), x, counts, int(n), t_ext, x_max, int(stop))

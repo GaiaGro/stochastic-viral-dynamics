@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from exp_regime_map import BASE, X0, classify_ode, k_threshold, params, r_eff
+from exp_regime_map import X0, classify_ode, k_threshold, params, r_eff
 from viraldyn import r0_wild_type
 
 
@@ -19,6 +19,7 @@ def test_k_threshold_puts_r_eff_at_one():
 
 
 def test_classify_ode():
-    assert classify_ode(peak=3.0, end=0.0) == "extinction"
-    assert classify_ode(peak=500.0, end=0.01) == "cleared"
-    assert classify_ode(peak=500.0, end=40.0) == "chronic"
+    assert classify_ode(r_eff_E0=0.5, end=0.0) == "extinction"
+    assert classify_ode(r_eff_E0=3.0, end=0.01) == "cleared"
+    assert classify_ode(r_eff_E0=3.0, end=40.0) == "chronic"
+    assert classify_ode(r_eff_E0=0.5, end=40.0) == "chronic"  # declined, then regrew after the effectors decayed

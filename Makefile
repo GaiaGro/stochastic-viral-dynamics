@@ -3,7 +3,7 @@ PY ?= .venv/bin/python
 .PHONY: help install lock test bench figures clean exp-baseline exp-fluctuations exp-establishment exp-immune exp-immune-collapse exp-resistance exp-regime-map
 
 help:
-	@echo "install            create .venv with uv and install requirements.txt"
+	@echo "install            create .venv with uv and install the package with its test extra"
 	@echo "lock               write requirements-lock.txt from the current .venv"
 	@echo "test               run the unit tests (about 20 s)"
 	@echo "bench              time the compiled SSA in each regime"
@@ -29,7 +29,7 @@ exp-establishment:
 exp-immune:
 	$(PY) scripts/exp_immune_activation.py
 
-exp-immune-collapse:
+exp-immune-collapse: exp-immune  # reruns the seeds that experiment recorded
 	$(PY) scripts/exp_immune_collapse.py
 
 exp-resistance:
@@ -40,7 +40,7 @@ exp-regime-map:
 
 install:
 	uv venv .venv --python 3.12
-	uv pip install --python $(PY) -r requirements.txt -e .
+	uv pip install --python $(PY) -e .[test]
 
 lock:
 	uv pip freeze --python $(PY) | grep -v '^-e\|viraldyn' > requirements-lock.txt

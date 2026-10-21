@@ -9,9 +9,8 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 
-from exp_regime_map import BASE, BETA, K, X0, k_threshold
-from viraldyn import r0_wild_type
-from viraldyn.plotting import BLUE_RAMP, COLOR, DOUBLE, MUTED, SEQ_RAMP, panel_label, save, setup
+from exp_regime_map import BASE, X0, k_threshold
+from viraldyn.plotting import BLUE_RAMP, COLOR, DOUBLE, SEQ_RAMP, panel_label, save, setup
 
 ROOT = Path(__file__).resolve().parents[1]
 

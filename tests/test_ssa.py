@@ -14,7 +14,7 @@ def test_zero_rates_keep_state_constant():
     x0 = [5, 4, 3, 2, 1, 6]
     r = simulate(ZERO, x0, np.linspace(0, 10, 11), seed_value=1)
     assert r.stop_reason == STOP_NO_REACTIONS and r.n_events == 0
-    assert (r.X == x0).all() and (r.C == 0).all() and (r.x_end == x0).all()
+    assert (r.X == x0).all() and (r.c_end == 0).all() and (r.x_end == x0).all()
 
 
 def test_seed_reproduces_and_changes():
@@ -41,8 +41,8 @@ def test_grid_recording_is_piecewise_constant_state():
     p = ZERO.replace(lam=1000.0)  # pure immigration, so T(t) == x0 + number of events before t
     r = simulate(p, [0, 0, 0, 0, 0, 0], np.linspace(0, 2, 21), seed_value=3)
     assert r.stop_reason == STOP_T_END
-    assert (np.diff(r.X[:, 0]) >= 0).all() and (r.X[:, 0] == r.C[:, 5]).all()
-    assert r.X[0, 0] == 0 and r.x_end[0] >= r.X[-1, 0]
+    assert (np.diff(r.X[:, 0]) >= 0).all() and r.X[0, 0] == 0
+    assert r.x_end[0] >= r.X[-1, 0] and r.x_end[0] == r.c_end[5] == r.n_events  # every event was an immigration
 
 
 def test_stop_on_extinction_and_lineage_times():
@@ -81,7 +81,7 @@ def test_stop_above_cap():
 
 def test_stop_on_cumulative_infections():
     r = simulate(PRESETS["chronic"], [1000, 5, 0, 30, 0, 10], np.linspace(0, 60, 61), seed_value=2, stop_cum_infections=100)
-    assert r.stopped == "cum_infections" and r.C.max() >= 0
+    assert r.stopped == "cum_infections" and r.cumulative_infections >= 100
     assert r.n_events >= 100 and r.t_end < 60
 
 
