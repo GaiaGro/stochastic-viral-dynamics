@@ -2,8 +2,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-figures/*
-!figures/.gitkeep
 paper/*.aux
 paper/*.bbl
 paper/*.blg
@@ -17,3 +15,11 @@ paper/*.synctex.gz
 paper/*.pdf
 paper/*.bcf
 paper/*.run.xml
+
+# internal material kept locally, not published
+paper/
+notebooks/
+PLAN.md
+WALKTHROUGH.md
+scripts/paper_tables.py
+figures/

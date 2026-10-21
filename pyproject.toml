@@ -15,6 +15,10 @@ authors = [
 ]
 dependencies = ["numpy", "scipy", "numba", "matplotlib"]
 
+[project.urls]
+Repository = "https://github.com/VanniLeonardo/stochastic-viral-dynamics"
+Issues = "https://github.com/VanniLeonardo/stochastic-viral-dynamics/issues"
+
 [project.optional-dependencies]
 test = ["pytest"]
 
