@@ -1,5 +1,5 @@
-"""The pure-Python Gillespie implementation from the course notebook, kept as a
-reference for distributional tests of the compiled simulator. Not used elsewhere."""
+"""An independent pure-Python Gillespie implementation, the project's original
+simulator, kept as a reference for distributional tests of the compiled one."""
 
 import numpy as np
 

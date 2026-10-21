@@ -100,7 +100,7 @@ def test_mean_tracks_ode_at_large_populations():
 
 
 def test_matches_reference_implementation():
-    """Extinction-time distribution agrees with the notebook's pure-Python SSA."""
+    """Extinction-time distribution agrees with the original pure-Python SSA."""
     p = PRESETS["establishment"]
     x0 = [1000, 0, 0, 1, 0, 1]
     n = 150

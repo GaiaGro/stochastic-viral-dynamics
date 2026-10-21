@@ -1,4 +1,4 @@
-"""Baseline (WP6): the exact simulation tracks the deterministic solution when
+"""Baseline: the exact simulation tracks the deterministic solution when
 populations are large, and the phase-plane picture of chronic infection.
 
 "chronic_large" preset: the resistance preset with every population scaled by 100
@@ -9,10 +9,10 @@ and the largest relative deviation of the median plus the band's coverage of the
 ODE are written to results/baseline_validation.csv. One 200-day realisation is
 stored with the ODE orbit for the phase plane of Figure 3.
 
-The notebook's "chronic" preset is checked separately (results/chronic_preset_check.csv):
-from its own uninfected equilibrium T* = 1e6 the deterministic infection is cleared
-and every realisation dies, so its oscillations exist only when started from
-T0 = 1000, a thousandth of equilibrium.
+The "chronic" preset is checked separately (results/chronic_preset_check.csv): from
+its own uninfected equilibrium T* = 1e6 the deterministic infection is cleared and
+every realisation dies, so its oscillations exist only when started from T0 = 1000,
+a thousandth of equilibrium.
 
 Writes results/baseline_ensemble.npz and the two CSVs.
 """
@@ -54,10 +54,10 @@ def _alive(seed, p, x0, t_end):
 
 
 def chronic_preset_check(seed, n=200, t_end=60.0):
-    """The notebook's chronic preset from T0 = 1000 (as in the notebook) and from T0 = T*."""
+    """The chronic preset from T0 = 1000 and from its uninfected equilibrium T0 = T*."""
     p = PRESETS["chronic"]
     rows = []
-    for label, T0 in (("notebook_T0_1000", 1000), ("equilibrium_T0_Tstar", int(target_cell_equilibrium(p)))):
+    for label, T0 in (("T0_1000", 1000), ("T0_Tstar", int(target_cell_equilibrium(p)))):
         x0 = [T0, 5, 0, 30, 0, 10]
         t = np.linspace(0.0, 120.0, 2401)
         ode = solve_ode(p, x0, t)

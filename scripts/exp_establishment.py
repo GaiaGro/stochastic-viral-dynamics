@@ -1,4 +1,4 @@
-"""WP2: probability that an infection establishes from a small inoculum, from exact
+"""Probability that an infection establishes from a small inoculum, from exact
 simulation and from the branching-process prediction.
 
 Establishment: 100 cumulative infection events before every infected cell and

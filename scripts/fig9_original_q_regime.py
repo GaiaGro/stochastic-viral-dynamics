@@ -1,7 +1,7 @@
-"""Appendix figure: the regime map with the notebook's own effector proliferation
-rate (q = 0.1, chronic set point of one infected cell). The deterministic
-classification the notebook drew, next to what exact realisations do.
-Reads results/regime_map_notebook_q.csv; runs no simulation."""
+"""Appendix figure: the regime map with the establishment preset's own effector
+proliferation rate (q = 0.1, chronic set point of one infected cell): the
+deterministic classification next to what exact realisations do.
+Reads results/regime_map_original_q.csv; runs no simulation."""
 
 import csv
 from pathlib import Path
@@ -23,7 +23,7 @@ CLASS_LABEL = {"extinction": "extinction ($R_0 < 1$)", "cleared": "cleared (load
 
 def main():
     setup()
-    with open(ROOT / "results" / "regime_map_notebook_q.csv") as f:
+    with open(ROOT / "results" / "regime_map_original_q.csv") as f:
         rows = [{k: (v if k == "ode_class" else float(v)) for k, v in r.items()} for r in csv.DictReader(f)]
     cell = {(r["bw"], r["k"]): r for r in rows}
     bw = np.array(sorted({r["bw"] for r in rows}))
@@ -58,7 +58,7 @@ def main():
     ax_a.set_ylabel("effector killing rate $k$")
     for ax, lab in ((ax_a, "a"), (ax_b, "b"), (ax_c, "c")):
         panel_label(ax, lab)
-    out = save(fig, "fig9_notebook_regime")
+    out = save(fig, "fig9_original_q_regime")
     print("wrote", out)
 
 

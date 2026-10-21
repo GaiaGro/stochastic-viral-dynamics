@@ -1,4 +1,4 @@
-"""WP3: stochastic failure of immune activation.
+"""Stochastic failure of immune activation.
 
 Full model, "establishment" preset (R0 = 33; the deterministic solution clears the
 infection within two days through effector expansion). From one wild-type virion

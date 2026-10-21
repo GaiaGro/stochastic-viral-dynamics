@@ -1,8 +1,8 @@
-"""WP5: stochastic regime map over wild-type infectivity and effector killing rate.
+"""Stochastic regime map over wild-type infectivity and effector killing rate.
 
-The course notebook classified the (beta_w, k) plane with the deterministic model
-alone: extinction if R0 < 1, clearance if the viral load fell below one at day
-1000, chronic otherwise. Here each cell of a 25 x 25 log grid gets N exact
+A deterministic classification of the (beta_w, k) plane uses thresholds alone:
+extinction if R0 < 1, clearance if the viral load falls below one by the horizon,
+chronic otherwise. Here each cell of a 25 x 25 log grid gets N exact
 realisations from 5 wild-type virions and 10 effectors in the "establishment"
 preset (T* = 1000) and two probabilities are recorded:
 
@@ -17,7 +17,7 @@ probability.
 Two maps are written. With the preset's proliferation rate q = 0.1 the chronic
 set point is I* = d_E / q = 1 infected cell, so every realisation that
 establishes is cleared by day 200 and the deterministic chronic region does not
-exist stochastically (results/regime_map_notebook_q.csv). The main map
+exist stochastically (results/regime_map_original_q.csv). The main map
 (results/regime_map.csv) lowers q to 0.002 so that I* = 50 and persistence has a
 genuine boundary.
 """
@@ -39,8 +39,8 @@ from viraldyn.theory import establishment_probability, establishment_probability
 
 ROOT = Path(__file__).resolve().parents[1]
 Q_MAIN = 0.002  # chronic set point I* = d_E / q = 50 infected cells
-Q_NOTEBOOK = 0.1  # the preset's value: I* = 1
-MAPS = {Q_MAIN: ROOT / "results" / "regime_map.csv", Q_NOTEBOOK: ROOT / "results" / "regime_map_notebook_q.csv"}
+Q_ORIGINAL = 0.1  # the preset's own value: I* = 1
+MAPS = {Q_MAIN: ROOT / "results" / "regime_map.csv", Q_ORIGINAL: ROOT / "results" / "regime_map_original_q.csv"}
 HORIZON_OUT = ROOT / "results" / "regime_map_horizon.csv"
 BASE = PRESETS["establishment"].replace(q=Q_MAIN)
 X0 = [1000, 0, 0, 5, 0, 10]  # T0 = T* = lambda / d_T

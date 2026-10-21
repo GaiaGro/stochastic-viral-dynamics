@@ -1,5 +1,5 @@
-"""Time the compiled SSA in the two regimes that matter for the compute budget
-(PLAN.md, WP1). Run with `make bench`."""
+"""Time the compiled SSA in the regimes that matter for the compute budget.
+Run with `make bench`."""
 
 import time
 

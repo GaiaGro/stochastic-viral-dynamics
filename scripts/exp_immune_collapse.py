@@ -1,4 +1,4 @@
-"""WP3 follow-up: what happens after an expanded effector response collapses.
+"""Follow-up: what happens after an expanded effector response collapses.
 
 For every effector death rate of at least 0.1/day in the sweep of
 exp_immune_activation.py, reruns the same seeds (full model) to day 200 and records,

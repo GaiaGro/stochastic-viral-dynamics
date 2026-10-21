@@ -67,7 +67,7 @@ def main():
     panel_label(ax_b, "b")
     handles = [
         Line2D([], [], color=COLOR["ode"], ls="--", lw=1.2, label=f"$R_\\mathrm{{eff}} = 1$ with $E_0 = {X0[5]}$ effectors"),
-        Line2D([], [], color=COLOR["ode"], ls=":", lw=1.0, label="$R_0 = 1$ without effectors (notebook)"),
+        Line2D([], [], color=COLOR["ode"], ls=":", lw=1.0, label="$R_0 = 1$ without effectors"),
         Line2D([], [], color=COLOR["mut"], lw=1.2, label="a: branching theory with decaying effectors, P = 0.5"),
         Line2D([], [], color=COLOR["mut"], lw=1.2, label="b: deterministic model persists at day 200"),
     ]

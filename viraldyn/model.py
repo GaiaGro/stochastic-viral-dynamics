@@ -2,7 +2,7 @@
 
 State x = (T, Iw, Im, Vw, Vm, E): uninfected target cells, cells infected by the
 wild type (w) or the mutant (m), free virions of each strain, and effector CTLs.
-Fifteen reaction channels; see the table in PLAN.md. The deterministic model is
+Fifteen reaction channels, listed in REACTIONS below. The deterministic model is
 dx/dt = S a(x), so the ODE and the stochastic simulation share one definition.
 """
 
@@ -182,13 +182,13 @@ def scale_system_size(p, omega):
     return p.replace(lam=p.lam * omega, bw=p.bw / omega, bm=p.bm / omega, q=p.q / omega, k=p.k / omega)
 
 
-# Parameter sets carried over from the course notebook (illustrative, not fitted).
+# Illustrative parameter sets, not fitted to data.
 PRESETS = {
-    # The notebook's "chronic" scenario. Its uninfected equilibrium is T* = 1e6, but the
-    # notebook starts every run from T0 = 1000, where the wild type's reproduction
-    # number is 0.2; the oscillations it shows are the transient of target-cell
-    # repopulation. Started from T*, the infection peaks on day 1 and is cleared
-    # (results/chronic_preset_check.csv). Kept for provenance and simulator tests.
+    # Large-population set with a chronic set point of 1000 infected cells. From its own
+    # uninfected equilibrium (T* = 1e6) the deterministic infection peaks on day 1 and is
+    # cleared, and every exact realisation dies; started from T0 = 1000, where the wild
+    # type's reproduction number is 0.2, it shows a long target-cell repopulation
+    # transient instead (results/chronic_preset_check.csv). Used in the simulator tests.
     "chronic": Params.make(
         lam=1e4, dT=0.01, bw=2e-5, bm=1e-5, pw=20.0, pm=18.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=0.5, k=1e-4, q=1e-4, dE=0.1,
@@ -197,14 +197,16 @@ PRESETS = {
         lam=100.0, dT=0.1, bw=2e-3, bm=2e-3, pw=100.0, pm=100.0, mu=1e-4,
         cw=25.0, cm=25.0, delta=1.0, k=0.2, q=0.05, dE=0.1,
     ),
-    # notebook section "Probability of Infection Establishment": R0 = 33, the ODE clears
+    # Small-population set (T* = 1000), R0 = 33, activation threshold of one cell; the
+    # deterministic infection from one virion is cleared within two days.
     "establishment": Params.make(
         lam=10.0, dT=0.01, bw=0.02, bm=0.016, pw=20.0, pm=20.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=0.5, k=0.1, q=0.1, dE=0.1,
     ),
-    # notebook section 3.3, deterministic competitive release. Its deterministic chronic
-    # infection passes through 3e-8 virions at the first trough; stochastically the
-    # infection dies there in every realisation, so it is not used for the therapy grid.
+    # Deterministic competitive-release set. Its deterministic chronic infection passes
+    # through 3e-8 virions at the first trough and its set point is two infected cells;
+    # no exact realisation survives, so it appears only in the viability check
+    # (results/preset_viability.csv).
     "therapy": Params.make(
         lam=100.0, dT=0.1, bw=2e-4, bm=1.6e-4, pw=100.0, pm=100.0, mu=1e-4,
         cw=4.0, cm=4.0, delta=1.0, k=0.01, q=0.05, dE=0.1,

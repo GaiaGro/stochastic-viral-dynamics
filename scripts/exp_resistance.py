@@ -1,10 +1,10 @@
-"""WP4: competitive release and the probability that drug resistance emerges.
+"""Competitive release and the probability that drug resistance emerges.
 
 "resistance" preset: R0 is 4.8 for the wild type and 3.9 for the mutant, so the
 drug suppresses the wild type only above the efficacy eps* = 0.798 at which
 R0(eps) = 1 (not 1 - 1/R0 = 0.79, because of virion consumption). It is the
-notebook's therapy preset with a slower, weaker effector response, because the
-notebook's deterministic chronic infection passes through 3e-8 virions and no
+therapy preset with a slower, weaker effector response, because the therapy
+preset's deterministic chronic infection passes through 3e-8 virions and no
 stochastic realisation survives that trough (results/preset_viability.csv). Each
 realisation starts at the uninfected equilibrium T* = 1000 with 10 wild-type-
 infected cells and 10 effectors, a primary infection into a naive host, runs
@@ -33,8 +33,8 @@ with the probability of its birth time. The arrival integral runs to the horizon
 Also written: a system-size sweep at one cell (lambda, 1/beta, 1/q, 1/k and the
 initial state scaled by Omega), a sensitivity check of the two immune parameters
 that define the preset, a longer horizon for the cells where the wild type
-persists, and the viability contrast between the notebook's therapy preset and
-the resistance preset.
+persists, and the viability contrast between the therapy preset and the
+resistance preset.
 
 Files: results/resistance.csv (one row per grid cell), results/resistance_runs.csv
 (one row per realisation), results/resistance_system_size.csv,
@@ -231,7 +231,7 @@ def _survives(seed, p):
 
 
 def viability(seed_start, n=1000):
-    """Untreated infection in the notebook's therapy preset and in the resistance preset:
+    """Untreated infection in the therapy preset and in the resistance preset:
     deterministic first trough and set point against stochastic survival to day 100."""
     rows = []
     for name in ("therapy", "resistance"):
