@@ -13,6 +13,7 @@ authors:
     affiliation: Bocconi University
 version: 1.0.0
 date-released: "2026-10-21"
+doi: 10.5281/zenodo.23737030
 license: MIT
 repository-code: "https://github.com/GaiaGro/stochastic-viral-dynamics"
 keywords:
