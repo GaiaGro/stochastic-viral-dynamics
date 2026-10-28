@@ -13,9 +13,8 @@ authors:
     affiliation: Bocconi University
 version: 1.0.0
 date-released: "2026-10-21"
-doi: 10.5281/zenodo.23547046
 license: MIT
-repository-code: "https://github.com/VanniLeonardo/stochastic-viral-dynamics"
+repository-code: "https://github.com/GaiaGro/stochastic-viral-dynamics"
 keywords:
   - within-host viral dynamics
   - Gillespie algorithm
